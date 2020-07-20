@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'SignInPage.dart';
+import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
+import 'package:flutterdeviceinventory/View/MyHomePage.dart';
+import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
+import 'package:flutterdeviceinventory/View/SignInPage.dart';
+import 'package:flutterdeviceinventory/View/SignUpPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,48 +18,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: MyHomePage(presenter: MyHomePagePresenter()),
       routes: {
-        '/signinPage': (BuildContext context) => SignInPage(),
+        '/signinPage': (BuildContext context) =>
+            SignInPage(presenter: SignInPresenter()),
+        '/signupPage': (BuildContext context) =>
+            SignUpPage(presenter: SignUpPresenter()),
       },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  List<String> _users = ['Admin', 'Employee'];
-
-  void _redirectToSigninPage() {
-    Navigator.pushNamed(context, '/signinPage');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('HomeScreen'),
-      ),
-      body: Center(
-        child: ListView.separated(
-          itemCount: _users.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              leading: Icon(Icons.accessibility),
-              title: Text(_users[index]),
-              onTap: () {
-                _redirectToSigninPage();
-              },
-            );
-          },
-          separatorBuilder: (context, index) => Divider(),
-        ),
-      ),
     );
   }
 }
