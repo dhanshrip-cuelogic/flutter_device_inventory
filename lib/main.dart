@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
+import 'package:flutterdeviceinventory/View/MyHomePage.dart';
+import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
+import 'package:flutterdeviceinventory/View/SignInPage.dart';
+import 'package:flutterdeviceinventory/View/SignUpPage.dart';
+import 'View/PlatformSelectionPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,27 +19,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('HomeScreen'),
-      ),
-      body: Center(),
-      // This trailing comma makes auto-formatting nicer for build methods.
+      home: MyHomePage(presenter: MyHomePagePresenter()),
+      routes: {
+        '/signinPage': (BuildContext context) =>
+            SignInPage(presenter: SignInPresenter()),
+        '/signupPage': (BuildContext context) =>
+            SignUpPage(presenter: SignUpPresenter()),
+        '/platformSelectionPage': (BuildContext context) =>
+            PlatformSelectionPage(),
+      },
     );
   }
 }

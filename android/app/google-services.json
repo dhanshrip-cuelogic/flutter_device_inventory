@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "535153325887",
+    "firebase_url": "https://flutter-device-inventory.firebaseio.com",
+    "project_id": "flutter-device-inventory",
+    "storage_bucket": "flutter-device-inventory.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:535153325887:android:99a51f06d55e02dd29c58a",
+        "android_client_info": {
+          "package_name": "com.cuelogic.flutterdeviceinventory"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "535153325887-j2uecntoveka2it5a4hp8ns9m925036l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC12WynU3b4qy3lpBEKKC8wSvDnD1YpI7U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "535153325887-j2uecntoveka2it5a4hp8ns9m925036l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
