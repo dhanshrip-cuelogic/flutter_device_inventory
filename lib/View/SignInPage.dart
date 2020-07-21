@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Model/UserData.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
-import 'package:flutterdeviceinventory/View/DeviceList.dart';
 
 class SignInView {
   void redirectToPlatformSelectionPage() {}
@@ -119,7 +118,6 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
 
   @override
   void redirectToPlatformSelectionPage() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => DeviceList()));
+    Navigator.pushNamed(context, '/platformSelectionPage');
   }
 }

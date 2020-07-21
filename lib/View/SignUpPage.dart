@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
-import 'package:flutterdeviceinventory/View/SignUpView.dart';
+
+class SignUpView {
+  void showVerifyEmailDialog() {}
+  void clearFields() {}
+}
 
 class SignUpPage extends StatefulWidget {
   final SignUpPresenter presenter;
@@ -127,7 +131,9 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
           if (_formKey.currentState.validate()) {
             this.widget.presenter.validateAndSave(
                 email: _emailController.text,
-                password: _passwordController.text);
+                password: _passwordController.text,
+                cueid: _cueidController.text,
+                username: _usernameController.text);
             Scaffold.of(context)
                 .showSnackBar(SnackBar(content: Text('Processing Data')));
           }

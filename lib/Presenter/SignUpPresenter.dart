@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
-import 'package:flutterdeviceinventory/View/SignUpView.dart';
+import 'package:flutterdeviceinventory/View/SignUpPage.dart';
 
 class Presenter {
   set setView(SignUpView value) {}
@@ -41,10 +41,14 @@ class SignUpPresenter implements Presenter {
 
   @override
   void validateAndSave(
-      {@required String email, @required String password}) async {
+      {@required String email,
+      @required String password,
+      @required String cueid,
+      @required String username}) async {
     FirebaseUser user = await _auth.signUp(email, password);
     try {
       await user.sendEmailVerification();
+      _auth.saveEmployeeData(email: email, cueid: cueid, username: username);
       _signUpView.clearFields();
       _signUpView.showVerifyEmailDialog();
     } catch (e) {

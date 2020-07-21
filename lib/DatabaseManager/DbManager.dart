@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutterdeviceinventory/Model/EmployeeModel.dart';
 
 class DbManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseDatabase _database = FirebaseDatabase.instance;
 
   Future signIn(String email, String password) async {
     AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(
@@ -34,5 +37,10 @@ class DbManager {
   Future<bool> isEmailVerified() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
     return user.isEmailVerified;
+  }
+
+  Future saveEmployeeData({String email, String cueid, String username}) {
+    Employee employee = Employee(email, cueid, username);
+    _database.reference().child('Employee').push().set(employee.toJson());
   }
 }

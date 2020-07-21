@@ -5,6 +5,7 @@ import 'package:flutterdeviceinventory/View/MyHomePage.dart';
 import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
 import 'package:flutterdeviceinventory/View/SignInPage.dart';
 import 'package:flutterdeviceinventory/View/SignUpPage.dart';
+import 'View/PlatformSelectionPage.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,6 +25,8 @@ class MyApp extends StatelessWidget {
             SignInPage(presenter: SignInPresenter()),
         '/signupPage': (BuildContext context) =>
             SignUpPage(presenter: SignUpPresenter()),
+        '/platformSelectionPage': (BuildContext context) =>
+            PlatformSelectionPage(),
       },
     );
   }

@@ -1,24 +1,22 @@
 import 'package:firebase_database/firebase_database.dart';
 
-class Todo {
-  String key;
-  String subject;
-  bool completed;
-  String userId;
+class Employee {
+  String username;
+  String email;
+  String cueid;
 
-  Todo(this.subject, this.userId, this.completed);
+  Employee(this.email, this.cueid, this.username);
 
-  Todo.fromSnapshot(DataSnapshot snapshot)
-      : key = snapshot.key,
-        userId = snapshot.value["userId"],
-        subject = snapshot.value["subject"],
-        completed = snapshot.value["completed"];
+  Employee.fromSnapshot(DataSnapshot snapshot)
+      : username = snapshot.value["username"],
+        email = snapshot.value["email"],
+        cueid = snapshot.value["cueid"];
 
   toJson() {
     return {
-      "userId": userId,
-      "subject": subject,
-      "completed": completed,
+      "username": username,
+      "email": email,
+      "cueid": cueid,
     };
   }
 }
