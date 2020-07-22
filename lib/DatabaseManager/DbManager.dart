@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Model/EmployeeModel.dart';
 
 class DbManager {
@@ -34,13 +35,18 @@ class DbManager {
 //    user.sendEmailVerification();
 //  }
 
-  Future<bool> isEmailVerified() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
+  Future<bool> isEmailVerified(FirebaseUser user) async {
     return user.isEmailVerified;
   }
 
   Future saveEmployeeData({String email, String cueid, String username}) {
     Employee employee = Employee(email, cueid, username);
     _database.reference().child('Employee').push().set(employee.toJson());
+  }
+
+  Future saveDeviceData({String deviceName, String osVersion}) {
+    var status = 'Available';
+    Device device = Device(deviceName, osVersion, status);
+    _database.reference().child('AndroidDevices').push().set(device.toJson());
   }
 }

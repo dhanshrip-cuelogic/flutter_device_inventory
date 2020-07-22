@@ -4,6 +4,8 @@ import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 
 class SignInView {
   void redirectToPlatformSelectionPage() {}
+  void clearFields() {}
+  void requestToVerify() {}
 }
 
 class SignInPage extends StatefulWidget {
@@ -119,5 +121,34 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   @override
   void redirectToPlatformSelectionPage() {
     Navigator.pushNamed(context, '/platformSelectionPage');
+  }
+
+  @override
+  void requestToVerify() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Verify your account"),
+          content: new Text(
+              "Link has been already sent to your email account please verify it to move forward."),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Dismiss"),
+              onPressed: () {
+                Navigator.of(context).popAndPushNamed('/signinPage');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void clearFields() {
+    _emailController.text = '';
+    _passwordController.text = '';
   }
 }

@@ -21,7 +21,12 @@ class SignInPresenter implements Presenter {
   void validateAndLogin(
       {@required String email, @required String password}) async {
     FirebaseUser user = await _auth.signIn(email, password);
-    print('Logged in with user id --------------- ${user.uid}');
-    _view.redirectToPlatformSelectionPage();
+    if (await _auth.isEmailVerified(user)) {
+      _view.clearFields();
+      _view.redirectToPlatformSelectionPage();
+    } else {
+      _view.clearFields();
+      _view.requestToVerify();
+    }
   }
 }

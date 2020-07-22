@@ -8,10 +8,20 @@ class DeviceList extends StatelessWidget {
       appBar: AppBar(
         title: Text('Device List'),
         centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.pushNamed(context, '/addDevice');
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Text(userData.user),
       ),
     );
   }
+
+  void _redirectToAddDevice() {}
 }
