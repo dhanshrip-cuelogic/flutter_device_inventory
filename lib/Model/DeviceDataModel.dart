@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class Device {
+  String key;
   String deviceName;
   String osVersion;
   String status;
@@ -8,7 +9,8 @@ class Device {
   Device(this.deviceName, this.osVersion, this.status);
 
   Device.fromSnapshot(DataSnapshot snapshot)
-      : deviceName = snapshot.value["deviceName"],
+      : key = snapshot.key,
+        deviceName = snapshot.value["deviceName"],
         osVersion = snapshot.value["osVersion"],
         status = snapshot.value["status"];
 
