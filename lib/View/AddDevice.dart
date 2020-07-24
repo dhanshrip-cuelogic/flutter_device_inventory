@@ -52,7 +52,6 @@ class _AddDeviceState extends State<AddDevice> implements AddDeviceView {
                 hintText: 'OS Version',
               ),
               keyboardType: TextInputType.text,
-              obscureText: true,
               controller: _osVersionController,
               validator: (value) {
                 if (value.isEmpty) {
@@ -78,6 +77,29 @@ class _AddDeviceState extends State<AddDevice> implements AddDeviceView {
       child: Text('Save'),
     );
   }
+
+  Widget successfulDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Successful"),
+          content: new Text("Data has been successfully added."),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Dismiss"),
+              onPressed: () {
+                Navigator.of(context).popAndPushNamed('/deviceList');
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
-class AddDeviceView {}
+class AddDeviceView {
+  void successfulDialog() {}
+}

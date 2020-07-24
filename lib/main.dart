@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/AddDevicePresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/PlatformSelectionPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
@@ -11,6 +12,7 @@ import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
 import 'package:flutterdeviceinventory/View/SignInPage.dart';
 import 'package:flutterdeviceinventory/View/SignUpPage.dart';
 import 'View/AddDevice.dart';
+import 'View/EditDevice.dart';
 import 'View/PlatformSelectionPage.dart';
 
 void main() {
@@ -38,6 +40,9 @@ class MyApp extends StatelessWidget {
         '/addDevice': (BuildContext context) =>
             AddDevice(presenter: AddDevicePresenter()),
         '/deviceDetails': (BuildContext context) => DeviceDetails(),
+        '/editDevice': (BuildContext context) => EditDevice(
+              presenter: EditDevicePresenter(),
+            ),
       },
     );
   }

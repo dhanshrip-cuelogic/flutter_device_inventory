@@ -5,6 +5,7 @@ import 'package:flutterdeviceinventory/View/DeviceList.dart';
 class Presenter {
   set setView(DeviceListView value) {}
   void fetchDeviceData() {}
+  void deleteDevice(String key, int index) {}
 }
 
 class DeviceListPresenter implements Presenter {
@@ -26,5 +27,11 @@ class DeviceListPresenter implements Presenter {
     devicesList = await _dbManager.fetchDevices();
     print('Here is the deviceList----------------$devicesList');
     _view.refreshState(devicesList);
+  }
+
+  @override
+  void deleteDevice(String key, int index) {
+    _dbManager.deleteDevice(key: key);
+    _view.removeDeviceFromList(index);
   }
 }

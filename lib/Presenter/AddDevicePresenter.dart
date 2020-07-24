@@ -18,6 +18,6 @@ class AddDevicePresenter implements Presenter {
   @override
   void saveDeviceData({String deviceName, String osVersion}) {
     _auth.saveDeviceData(deviceName: deviceName, osVersion: osVersion);
-    print('Data has been sent to save on database');
+    _view.successfulDialog();
   }
 }

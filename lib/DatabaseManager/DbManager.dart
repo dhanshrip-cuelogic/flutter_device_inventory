@@ -63,7 +63,6 @@ class DbManager {
         .onChildAdded
         .listen((event) {
       deviceList.add(Device.fromSnapshot(event.snapshot));
-      print('Here is the deviceList from dbmanager----------------$deviceList');
     });
 
 //    StreamSubscription<Event> onUpdateDevices = _database
@@ -73,5 +72,22 @@ class DbManager {
 //        .listen((event) {});
 
     return deviceList;
+  }
+
+  void updateDevice({Device device, String key}) {
+    _database
+        .reference()
+        .child('AndroidDevices')
+        .child(key)
+        .set(device.toJson());
+  }
+
+  bool deleteDevice({String key}) {
+    _database
+        .reference()
+        .child('AndroidDevices')
+        .child(key)
+        .remove()
+        .then((value) => true);
   }
 }

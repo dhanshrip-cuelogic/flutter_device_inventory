@@ -44,6 +44,7 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
           padding: EdgeInsets.all(50.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(
@@ -107,12 +108,14 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   }
 
   Widget forgotPassword() {
-    return GestureDetector(
-      child: Text(
-        'Forgot Password',
-        style: TextStyle(
-          color: Colors.blue,
-          fontStyle: FontStyle.normal,
+    return Expanded(
+      child: GestureDetector(
+        child: Text(
+          'Forgot Password',
+          style: TextStyle(
+            color: Colors.blue,
+            fontStyle: FontStyle.normal,
+          ),
         ),
       ),
     );
