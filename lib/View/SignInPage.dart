@@ -10,8 +10,9 @@ class SignInView {
 
 class SignInPage extends StatefulWidget {
   final SignInPresenter presenter;
+  final VoidCallback signedIn;
 
-  SignInPage({this.presenter});
+  SignInPage({this.presenter, this.signedIn});
 
   @override
   _SignInPageState createState() => _SignInPageState();
@@ -123,7 +124,9 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
 
   @override
   void redirectToPlatformSelectionPage() {
-    Navigator.pushNamed(context, '/platformSelectionPage');
+    print('Login button is pressed from SignIn Page.');
+    widget.signedIn();
+    Navigator.pop(context);
   }
 
   @override

@@ -1,12 +1,16 @@
 import 'package:flutterdeviceinventory/Model/HomePageModel.dart';
 import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/View/HomePageView.dart';
 import 'package:flutter/material.dart';
 
+import 'SignInPage.dart';
+
 class MyHomePage extends StatefulWidget {
   final MyHomePagePresenter presenter;
+  final VoidCallback signedIn;
 
-  MyHomePage({this.presenter});
+  MyHomePage({this.presenter, this.signedIn});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -29,7 +33,18 @@ class _MyHomePageState extends State<MyHomePage> implements HomePageView {
   }
 
   void redirectToSignInPage() {
-    Navigator.pushNamed(context, '/signinPage');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SignInPage(
+                  presenter: SignInPresenter(),
+                  signedIn: signedIn,
+                )));
+  }
+
+  void signedIn() {
+    print('This is callback from HomePage.');
+    widget.signedIn();
   }
 
   @override

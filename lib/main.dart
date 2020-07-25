@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutterdeviceinventory/Presenter/AddDevicePresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/PlatformSelectionPresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
-import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
-import 'package:flutterdeviceinventory/View/DeviceList.dart';
-import 'package:flutterdeviceinventory/View/MyHomePage.dart';
-import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
-import 'package:flutterdeviceinventory/View/SignInPage.dart';
-import 'package:flutterdeviceinventory/View/SignUpPage.dart';
+import 'package:flutterdeviceinventory/Presenter/IssuedDevicePresenter.dart';
+import 'package:flutterdeviceinventory/View/IssuedDeviceList.dart';
+import 'DatabaseManager/DbManager.dart';
+import 'Presenter/AddDevicePresenter.dart';
+import 'Presenter/DeviceListPresenter.dart';
+import 'Presenter/EditDevicePresenter.dart';
+import 'Presenter/PlatformSelectionPresenter.dart';
+import 'Presenter/SignUpPresenter.dart';
+import 'View/DeviceDetails.dart';
+import 'View/DeviceList.dart';
+import 'View/RootPage.dart';
+import 'View/SignUpPage.dart';
 import 'View/AddDevice.dart';
 import 'View/EditDevice.dart';
 import 'View/PlatformSelectionPage.dart';
@@ -27,10 +27,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(presenter: MyHomePagePresenter()),
+      home: RootPage(auth: DbManager()),
       routes: {
-        '/signinPage': (BuildContext context) =>
-            SignInPage(presenter: SignInPresenter()),
         '/signupPage': (BuildContext context) =>
             SignUpPage(presenter: SignUpPresenter()),
         '/platformSelectionPage': (BuildContext context) =>
@@ -40,9 +38,10 @@ class MyApp extends StatelessWidget {
         '/addDevice': (BuildContext context) =>
             AddDevice(presenter: AddDevicePresenter()),
         '/deviceDetails': (BuildContext context) => DeviceDetails(),
-        '/editDevice': (BuildContext context) => EditDevice(
-              presenter: EditDevicePresenter(),
-            ),
+        '/editDevice': (BuildContext context) =>
+            EditDevice(presenter: EditDevicePresenter()),
+        '/issuedDeviceList': (BuildContext context) =>
+            IssuedDeviceList(presenter: IssuedPresenter())
       },
     );
   }

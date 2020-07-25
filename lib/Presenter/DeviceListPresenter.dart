@@ -25,7 +25,6 @@ class DeviceListPresenter implements Presenter {
   @override
   void fetchDeviceData() async {
     devicesList = await _dbManager.fetchDevices();
-    print('Here is the deviceList----------------$devicesList');
     _view.refreshState(devicesList);
   }
 

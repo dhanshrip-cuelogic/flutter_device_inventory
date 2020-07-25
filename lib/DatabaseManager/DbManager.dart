@@ -4,6 +4,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Model/EmployeeModel.dart';
 
+enum AuthStatus {
+  notSignedIn,
+  signedIn,
+}
+
 class DbManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;

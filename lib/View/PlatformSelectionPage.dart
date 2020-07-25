@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/PlatformSelectionModel.dart';
 import 'package:flutterdeviceinventory/Presenter/PlatformSelectionPresenter.dart';
 
@@ -8,8 +9,10 @@ class PlatformSelectionView {
 
 class PlatformSelectionPage extends StatefulWidget {
   final PlatformSelectionPresenter presenter;
+  final VoidCallback signOut;
 
-  PlatformSelectionPage({this.presenter});
+  PlatformSelectionPage({this.presenter, this.signOut});
+
   @override
   _PlatformSelectionPageState createState() => _PlatformSelectionPageState();
 }
@@ -17,10 +20,12 @@ class PlatformSelectionPage extends StatefulWidget {
 class _PlatformSelectionPageState extends State<PlatformSelectionPage>
     implements PlatformSelectionView {
   PlatformSelectionModel _model;
+  DbManager _auth;
 
   @override
   void initState() {
     this.widget.presenter.setView = this;
+    _auth = DbManager();
     super.initState();
   }
 
@@ -30,6 +35,17 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
       appBar: AppBar(
         title: Text('Platform Selection'),
         centerTitle: true,
+        actions: <Widget>[
+          FlatButton(
+            textColor: Colors.white,
+            onPressed: () {
+              _auth.signOut();
+              widget.signOut();
+            },
+            child: Text("Logout"),
+            shape: CircleBorder(side: BorderSide(color: Colors.transparent)),
+          ),
+        ],
       ),
       body: ListView.separated(
         itemCount: _model.platforms.length,
@@ -55,6 +71,6 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
   }
 
   void _redirectToDeviceList() {
-    Navigator.pushNamed(context, '/deviceList');
+    Navigator.pushNamed(context, '/issuedDeviceList');
   }
 }
