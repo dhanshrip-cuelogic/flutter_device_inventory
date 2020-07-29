@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterdeviceinventory/Model/HomePageModel.dart';
 import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
@@ -8,7 +9,7 @@ import 'SignInPage.dart';
 
 class MyHomePage extends StatefulWidget {
   final MyHomePagePresenter presenter;
-  final VoidCallback signedIn;
+  final void Function(FirebaseUser) signedIn;
 
   MyHomePage({this.presenter, this.signedIn});
 
@@ -36,15 +37,12 @@ class _MyHomePageState extends State<MyHomePage> implements HomePageView {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => SignInPage(
-                  presenter: SignInPresenter(),
-                  signedIn: signedIn,
-                )));
+            builder: (context) =>
+                SignInPage(presenter: SignInPresenter(), signedIn: signedIn)));
   }
 
-  void signedIn() {
-    print('This is callback from HomePage.');
-    widget.signedIn();
+  void signedIn(FirebaseUser user) {
+    widget.signedIn(user);
   }
 
   @override

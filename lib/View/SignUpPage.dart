@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
+import 'SignInPage.dart';
 
 class SignUpView {
   void showVerifyEmailDialog() {}
@@ -8,8 +11,9 @@ class SignUpView {
 
 class SignUpPage extends StatefulWidget {
   final SignUpPresenter presenter;
+  final void Function(FirebaseUser) signedIn;
 
-  SignUpPage({this.presenter});
+  SignUpPage({this.presenter, this.signedIn});
 
   @override
   _SignUpPageState createState() => _SignUpPageState();
@@ -40,83 +44,85 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
         ),
         body: Padding(
           padding: EdgeInsets.all(50.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Email',
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
+
+                    if (!this.widget.presenter.validateEmail(email: value)) {
+                      return 'Please enter valid Cuelogic email address.';
+                    }
+
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.emailAddress,
-                controller: _emailController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'CueID',
+                  ),
+                  keyboardType: TextInputType.text,
+                  controller: _cueidController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
 
-                  if (!this.widget.presenter.validateEmail(email: value)) {
-                    return 'Please enter valid Cuelogic email address.';
-                  }
+                    if (!this.widget.presenter.validateCueID(cueId: value)) {
+                      return 'Please enter valid CueID.';
+                    }
 
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'CueID',
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.text,
-                controller: _cueidController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
-
-                  if (!this.widget.presenter.validateCueID(cueId: value)) {
-                    return 'Please enter valid CueID.';
-                  }
-
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Username',
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Username',
+                  ),
+                  controller: _usernameController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
+                    return null;
+                  },
                 ),
-                controller: _usernameController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Password',
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                  ),
+                  controller: _passwordController,
+                  obscureText: true,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
+
+                    if (!this
+                        .widget
+                        .presenter
+                        .validatePassword(password: value)) {
+                      return 'Please enter Password stating with Capital and must include atleast one small letter, one special character and one digit';
+                    }
+
+                    return null;
+                  },
                 ),
-                controller: _passwordController,
-                obscureText: true,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
-
-                  if (!this
-                      .widget
-                      .presenter
-                      .validatePassword(password: value)) {
-                    return 'Please enter Password stating with Capital and must include atleast one small letter, one special character and one digit';
-                  }
-
-                  return null;
-                },
-              ),
-              signUpButton(),
-              Text('Already have an account?',
-                  style: TextStyle(color: Colors.blue)),
-              loginButton()
-            ],
+                signUpButton(),
+                Text('Already have an account?',
+                    style: TextStyle(color: Colors.blue)),
+                loginButton()
+              ],
+            ),
           ),
         ),
       ),
@@ -147,10 +153,20 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
   Widget loginButton() {
     return RaisedButton(
       onPressed: () {
-        Navigator.pushNamed(context, '/signinPage');
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SignInPage(
+                      presenter: SignInPresenter(),
+                      signedIn: signedIn,
+                    )));
       },
       child: Text('Login'),
     );
+  }
+
+  void signedIn(FirebaseUser user) {
+    widget.signedIn(user);
   }
 
   @override
@@ -166,7 +182,13 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
             new FlatButton(
               child: new Text("Dismiss"),
               onPressed: () {
-                Navigator.of(context).popAndPushNamed('/signinPage');
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SignInPage(
+                              presenter: SignInPresenter(),
+                              signedIn: signedIn,
+                            )));
               },
             ),
           ],

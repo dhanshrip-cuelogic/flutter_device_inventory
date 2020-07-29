@@ -1,5 +1,4 @@
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
-import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/View/IssuedDeviceList.dart';
 
 class Presenter {
@@ -9,9 +8,7 @@ class Presenter {
 }
 
 class IssuedPresenter implements Presenter {
-  List<Device> deviceList = [];
-  List<Device> availableDevices = [];
-  List<Device> issuedDevices = [];
+  List deviceList = [];
   IssuedDeviceView _view;
   DbManager _dbManager = DbManager();
 
@@ -22,18 +19,7 @@ class IssuedPresenter implements Presenter {
 
   @override
   void fetchDevices() async {
-    deviceList = await _dbManager.fetchDevices();
-    _view.refreshState(deviceList);
-
-//    deviceList = await _dbManager.fetchDevices();
-//    print('------  After fetching device ....... $deviceList -----');
-////    sortDeviceList(deviceList);
-//    for (var device in deviceList) {
-//      if (device.status == 'Available') {
-//        availableDevices.add(device);
-//      } else {
-//        issuedDevices.add(device);
-//      }
-//    }
+    deviceList = await _dbManager.fetchIssuedDevices();
+    _view.refreshState(deviceList[0], deviceList[1]);
   }
 }

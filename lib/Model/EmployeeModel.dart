@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 
 class Employee {
+  String userid;
   String username;
   String email;
   String cueid;
@@ -8,7 +9,8 @@ class Employee {
   Employee(this.email, this.cueid, this.username);
 
   Employee.fromSnapshot(DataSnapshot snapshot)
-      : username = snapshot.value["username"],
+      : userid = snapshot.key,
+        username = snapshot.value["username"],
         email = snapshot.value["email"],
         cueid = snapshot.value["cueid"];
 

@@ -23,7 +23,7 @@ class SignInPresenter implements Presenter {
     FirebaseUser user = await _auth.signIn(email, password);
     if (await _auth.isEmailVerified(user)) {
       _view.clearFields();
-      _view.redirectToPlatformSelectionPage();
+      _view.redirectToPlatformSelectionPage(user);
     } else {
       _view.clearFields();
       _view.requestToVerify();

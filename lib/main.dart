@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/Presenter/DeviceDetailsPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/IssuedDevicePresenter.dart';
 import 'package:flutterdeviceinventory/View/IssuedDeviceList.dart';
 import 'DatabaseManager/DbManager.dart';
+import 'Model/DeviceDataModel.dart';
 import 'Presenter/AddDevicePresenter.dart';
 import 'Presenter/DeviceListPresenter.dart';
 import 'Presenter/EditDevicePresenter.dart';
@@ -37,11 +39,20 @@ class MyApp extends StatelessWidget {
             DeviceList(presenter: DeviceListPresenter()),
         '/addDevice': (BuildContext context) =>
             AddDevice(presenter: AddDevicePresenter()),
-        '/deviceDetails': (BuildContext context) => DeviceDetails(),
         '/editDevice': (BuildContext context) =>
             EditDevice(presenter: EditDevicePresenter()),
         '/issuedDeviceList': (BuildContext context) =>
             IssuedDeviceList(presenter: IssuedPresenter())
+      },
+      onGenerateRoute: (setting) {
+        if (setting.name == DeviceDetails.routeName) {
+          final Device device = setting.arguments;
+          return MaterialPageRoute(
+              builder: (BuildContext context) => DeviceDetails(
+                    presenter: DeviceDetailsPresenter(),
+                    device: device,
+                  ));
+        }
       },
     );
   }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
 
+import 'DeviceDetails.dart';
+
 class DeviceList extends StatefulWidget {
   final DeviceListPresenter presenter;
 
@@ -48,7 +50,7 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
               ],
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/deviceDetails',
+              Navigator.pushNamed(context, DeviceDetails.routeName,
                   arguments: devices[index]);
             },
           );

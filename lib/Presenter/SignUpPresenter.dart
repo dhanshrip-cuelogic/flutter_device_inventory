@@ -48,7 +48,8 @@ class SignUpPresenter implements Presenter {
     FirebaseUser user = await _auth.signUp(email, password);
     try {
       await user.sendEmailVerification();
-      _auth.saveEmployeeData(email: email, cueid: cueid, username: username);
+      _auth.saveEmployeeData(
+          userid: user.uid, email: email, cueid: cueid, username: username);
       _signUpView.clearFields();
       _signUpView.showVerifyEmailDialog();
     } catch (e) {

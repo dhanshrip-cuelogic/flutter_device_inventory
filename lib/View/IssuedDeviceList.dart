@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/IssuedDevicePresenter.dart';
+import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
 
 class IssuedDeviceView {
-  void getSortedList() {}
-
-  void refreshState(List<Device> deviceList) {}
+  void refreshState(List<Device> availablelist, List<Device> issuedList) {}
 }
 
 class IssuedDeviceList extends StatefulWidget {
@@ -31,14 +30,6 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
 
   @override
   Widget build(BuildContext context) {
-//    for (var device in availableDevices) {
-//      print('------${device.deviceName}-----');
-//    }
-//
-//    for (var device in issuedDevices) {
-//      print('------${device.deviceName}-----');
-//    }
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Issued Devices'),
@@ -55,12 +46,14 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
             child: ListView.separated(
                 itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text('$index'),
-                    onTap: () {},
+                    title: Text(availableDevices[index].deviceName),
+                    onTap: () {
+                      redirectToDeviceDetails(availableDevices[index]);
+                    },
                   );
                 },
                 separatorBuilder: (context, index) => Divider(),
-                itemCount: 4),
+                itemCount: availableDevices.length),
           ),
           ListTile(
             title: Text('Issued Devices'),
@@ -72,7 +65,9 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(issuedDevices[index].deviceName),
-                    onTap: () {},
+                    onTap: () {
+                      redirectToDeviceDetails(issuedDevices[index]);
+                    },
                   );
                 },
                 separatorBuilder: (context, index) => Divider(),
@@ -84,39 +79,14 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
   }
 
   @override
-  void getSortedList() {
-    print(
-        '----------Here is available devices from presenter--------${widget.presenter.availableDevices}-----------');
-    print(
-        '---------Here is issued devices from presenter---------${widget.presenter.issuedDevices}-----------');
-    availableDevices = widget.presenter.availableDevices;
-    issuedDevices = widget.presenter.issuedDevices;
-//    refreshState();
+  void refreshState(List<Device> availablelist, List<Device> issuedList) {
+    setState(() {
+      availableDevices = availablelist;
+      issuedDevices = issuedList;
+    });
   }
 
-  @override
-  void refreshState(List<Device> deviceList) {
-    print('-----------Just for checking.....----------');
-    for (var device in deviceList) {
-      print('-----------${device.status}----------');
-    }
-    setState(() {
-      issuedDevices = deviceList;
-    });
-
-//    List<Device> available = [];
-//    List<Device> issued = [];
-//    for (var device in deviceList) {
-//      print('-----------${device.deviceName}----------');
-//      if (device.status == 'Available') {
-//        available.add(device);
-//      } else {
-//        issued.add(device);
-//      }
-//    }
-//    setState(() {
-//      availableDevices = available;
-//      issuedDevices = issued;
-//    });
+  void redirectToDeviceDetails(Device device) {
+    Navigator.pushNamed(context, DeviceDetails.routeName, arguments: device);
   }
 }

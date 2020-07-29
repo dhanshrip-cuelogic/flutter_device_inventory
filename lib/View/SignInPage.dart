@@ -1,16 +1,21 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Model/UserData.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
+import 'package:flutterdeviceinventory/View/ForgotPassword.dart';
+
+import 'SignUpPage.dart';
 
 class SignInView {
-  void redirectToPlatformSelectionPage() {}
+  void redirectToPlatformSelectionPage(FirebaseUser user) {}
   void clearFields() {}
   void requestToVerify() {}
 }
 
 class SignInPage extends StatefulWidget {
   final SignInPresenter presenter;
-  final VoidCallback signedIn;
+  final void Function(FirebaseUser) signedIn;
 
   SignInPage({this.presenter, this.signedIn});
 
@@ -51,7 +56,6 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
                 decoration: InputDecoration(
                   hintText: 'Email',
                 ),
-                keyboardType: TextInputType.emailAddress,
                 controller: _emailController,
                 validator: (value) {
                   if (value.isEmpty) {
@@ -63,7 +67,6 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
                 decoration: InputDecoration(
                   hintText: 'Password',
                 ),
-                keyboardType: TextInputType.text,
                 obscureText: true,
                 controller: _passwordController,
                 validator: (value) {
@@ -95,11 +98,19 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
     );
   }
 
+  void signedIn(FirebaseUser user) {
+    widget.signedIn(user);
+  }
+
   Widget signUpButton() {
     if (userData.user == 'Employee') {
       return RaisedButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/signupPage');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SignUpPage(
+                      presenter: SignUpPresenter(), signedIn: signedIn)));
         },
         child: Text('SignUp'),
       );
@@ -118,14 +129,17 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
             fontStyle: FontStyle.normal,
           ),
         ),
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ForgotPassword()));
+        },
       ),
     );
   }
 
   @override
-  void redirectToPlatformSelectionPage() {
-    print('Login button is pressed from SignIn Page.');
-    widget.signedIn();
+  void redirectToPlatformSelectionPage(FirebaseUser user) {
+    widget.signedIn(user);
     Navigator.pop(context);
   }
 
@@ -143,7 +157,7 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
             new FlatButton(
               child: new Text("Dismiss"),
               onPressed: () {
-                Navigator.of(context).popAndPushNamed('/signinPage');
+                Navigator.of(context).pop();
               },
             ),
           ],

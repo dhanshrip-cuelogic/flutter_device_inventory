@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Presenter/MyHomePagePresenter.dart';
@@ -15,24 +16,34 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
+  FirebaseUser currentUser;
   AuthStatus _authStatus = AuthStatus.notSignedIn;
 
   @override
   void initState() {
     widget.auth.getCurrentUser().then((user) {
       setState(() {
-        _authStatus =
-            user == null ? AuthStatus.notSignedIn : AuthStatus.signedIn;
+        if (user == null) {
+          signOut();
+        } else {
+          currentUser = user;
+          signedIn(user);
+        }
       });
     });
     super.initState();
   }
 
-  void signedIn() {
-    setState(() {
-      print('This is callback from RootPage.');
-      _authStatus = AuthStatus.signedIn;
-    });
+  void signedIn(FirebaseUser user) {
+    if (user.isEmailVerified) {
+      setState(() {
+        _authStatus = AuthStatus.signedIn;
+      });
+    } else {
+      setState(() {
+        _authStatus = AuthStatus.notSignedIn;
+      });
+    }
   }
 
   void signOut() {
@@ -48,10 +59,7 @@ class _RootPageState extends State<RootPage> {
         return PlatformSelectionPage(
             presenter: PlatformSelectionPresenter(), signOut: signOut);
       case AuthStatus.notSignedIn:
-        return MyHomePage(
-          presenter: MyHomePagePresenter(),
-          signedIn: signedIn,
-        );
+        return MyHomePage(presenter: MyHomePagePresenter(), signedIn: signedIn);
     }
   }
 }
