@@ -98,6 +98,13 @@ class _AddDeviceState extends State<AddDevice> implements AddDeviceView {
       },
     );
   }
+
+  @override
+  void dispose() {
+    _deviceNameController.dispose();
+    _osVersionController.dispose();
+    super.dispose();
+  }
 }
 
 class AddDeviceView {

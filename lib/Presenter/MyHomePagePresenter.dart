@@ -1,6 +1,6 @@
-import 'package:flutterdeviceinventory/Model/UserData.dart';
 import 'package:flutterdeviceinventory/Model/HomePageModel.dart';
 import 'package:flutterdeviceinventory/View/HomePageView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Presenter {
   set setView(HomePageView value) {}
@@ -8,13 +8,10 @@ class Presenter {
 }
 
 class MyHomePagePresenter implements Presenter {
-  UserData _userData;
   HomePageView _homepageView;
   HomePageModel _model;
-
   MyHomePagePresenter() {
     _model = HomePageModel();
-    _userData = userData;
   }
 
   @override
@@ -24,7 +21,10 @@ class MyHomePagePresenter implements Presenter {
   }
 
   @override
-  void onListTileOnTap(int index) {
-    _userData.user = _model.users[index];
+  void onListTileOnTap(int index) async {
+    String user = _model.users[index];
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(user);
+    prefs.setString('user', user);
   }
 }

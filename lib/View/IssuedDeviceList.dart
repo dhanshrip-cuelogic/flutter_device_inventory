@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/IssuedDevicePresenter.dart';
 import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
 
-class IssuedDeviceView {
-  void refreshState(List<Device> availablelist, List<Device> issuedList) {}
-}
+class IssuedDeviceView {}
 
 class IssuedDeviceList extends StatefulWidget {
   final IssuedPresenter presenter;
@@ -18,13 +17,13 @@ class IssuedDeviceList extends StatefulWidget {
 
 class _IssuedDeviceListState extends State<IssuedDeviceList>
     implements IssuedDeviceView {
+  DbManager _dbManager = DbManager();
   List<Device> availableDevices = [];
   List<Device> issuedDevices = [];
 
   @override
   void initState() {
     widget.presenter.setView = this;
-    widget.presenter.fetchDevices();
     super.initState();
   }
 
@@ -35,55 +34,62 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
         title: Text('Issued Devices'),
         centerTitle: true,
       ),
-      body: Column(
-        children: <Widget>[
-          ListTile(
-            title: Text('Available Devices'),
-            enabled: false,
-            leading: Icon(Icons.forward),
-          ),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(availableDevices[index].deviceName),
-                    onTap: () {
-                      redirectToDeviceDetails(availableDevices[index]);
+      body: FutureBuilder(
+        future: widget.presenter.fetchDevices(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.none ||
+              snapshot.data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          availableDevices = snapshot.data[0];
+          issuedDevices = snapshot.data[1];
+
+          return Column(
+            children: <Widget>[
+              ListTile(
+                title: Text('Available Devices'),
+                enabled: false,
+                leading: Icon(Icons.forward),
+              ),
+              Expanded(
+                child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(availableDevices[index].deviceName),
+                        onTap: () {
+                          redirectToDeviceDetails(availableDevices[index]);
+                        },
+                      );
                     },
-                  );
-                },
-                separatorBuilder: (context, index) => Divider(),
-                itemCount: availableDevices.length),
-          ),
-          ListTile(
-            title: Text('Issued Devices'),
-            enabled: false,
-            leading: Icon(Icons.forward),
-          ),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(issuedDevices[index].deviceName),
-                    onTap: () {
-                      redirectToDeviceDetails(issuedDevices[index]);
+                    separatorBuilder: (context, index) => Divider(),
+                    itemCount: availableDevices.length),
+              ),
+              ListTile(
+                title: Text('Issued Devices'),
+                enabled: false,
+                leading: Icon(Icons.forward),
+              ),
+              Expanded(
+                child: ListView.separated(
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(issuedDevices[index].deviceName),
+                        onTap: () {
+                          redirectToDeviceDetails(issuedDevices[index]);
+                        },
+                      );
                     },
-                  );
-                },
-                separatorBuilder: (context, index) => Divider(),
-                itemCount: issuedDevices.length),
-          ),
-        ],
+                    separatorBuilder: (context, index) => Divider(),
+                    itemCount: issuedDevices.length),
+              ),
+            ],
+          );
+        },
       ),
     );
-  }
-
-  @override
-  void refreshState(List<Device> availablelist, List<Device> issuedList) {
-    setState(() {
-      availableDevices = availablelist;
-      issuedDevices = issuedList;
-    });
   }
 
   void redirectToDeviceDetails(Device device) {

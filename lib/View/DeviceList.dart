@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
-
 import 'DeviceDetails.dart';
 
 class DeviceList extends StatefulWidget {
@@ -14,12 +14,12 @@ class DeviceList extends StatefulWidget {
 }
 
 class _DeviceListState extends State<DeviceList> implements DeviceListView {
+  DbManager _dbManager = DbManager();
   List<Device> devices = [];
 
   @override
   void initState() {
-    this.widget.presenter.setView = this;
-    this.widget.presenter.fetchDeviceData();
+    widget.presenter.setView = this;
     super.initState();
   }
 
@@ -38,25 +38,37 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
           ),
         ],
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(devices[index].deviceName),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                showEditIcon(devices[index]),
-                showDeleteIcon(devices[index].key, index),
-              ],
-            ),
-            onTap: () {
-              Navigator.pushNamed(context, DeviceDetails.routeName,
-                  arguments: devices[index]);
+      body: FutureBuilder(
+        future: widget.presenter.fetchDeviceData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.none ||
+              snapshot.data == null) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          devices = snapshot.data;
+          return ListView.separated(
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(devices[index].deviceName),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    showEditIcon(devices[index]),
+                    showDeleteIcon(devices[index].key, index),
+                  ],
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, DeviceDetails.routeName,
+                      arguments: devices[index]);
+                },
+              );
             },
+            separatorBuilder: (context, index) => Divider(),
+            itemCount: devices.length,
           );
         },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: devices.length,
       ),
     );
   }
@@ -64,7 +76,8 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
   @override
   void refreshState(List<Device> deviceList) {
     setState(() {
-      devices = deviceList;
+//      devices.clear();
+//      devices = deviceList;
     });
   }
 
@@ -126,5 +139,6 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
 
 class DeviceListView {
   void refreshState(List<Device> deviceList) {}
+
   void removeDeviceFromList(int index) {}
 }

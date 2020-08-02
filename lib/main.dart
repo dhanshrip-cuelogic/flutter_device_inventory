@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         '/editDevice': (BuildContext context) =>
             EditDevice(presenter: EditDevicePresenter()),
         '/issuedDeviceList': (BuildContext context) =>
-            IssuedDeviceList(presenter: IssuedPresenter())
+            IssuedDeviceList(presenter: IssuedPresenter()),
       },
       onGenerateRoute: (setting) {
         if (setting.name == DeviceDetails.routeName) {

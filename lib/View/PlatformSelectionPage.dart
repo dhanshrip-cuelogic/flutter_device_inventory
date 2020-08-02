@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/PlatformSelectionModel.dart';
 import 'package:flutterdeviceinventory/Presenter/PlatformSelectionPresenter.dart';
+import 'package:flutterdeviceinventory/View/SelectListPath.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlatformSelectionView {
   void refreshState(PlatformSelectionModel model) {}
@@ -39,6 +41,7 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
           FlatButton(
             textColor: Colors.white,
             onPressed: () {
+              removeUser();
               _auth.signOut();
               widget.signOut();
             },
@@ -71,6 +74,12 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
   }
 
   void _redirectToDeviceList() {
-    Navigator.pushNamed(context, '/issuedDeviceList');
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SelectListPath()));
+  }
+
+  void removeUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove("user");
   }
 }

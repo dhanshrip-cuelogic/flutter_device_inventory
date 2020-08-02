@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
-import 'package:flutterdeviceinventory/Model/UserData.dart';
 import 'package:flutterdeviceinventory/Presenter/DeviceDetailsPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/RegisterComplaintPresenter.dart';
 import 'package:flutterdeviceinventory/View/DeviceHistoryPage.dart';
 import 'package:flutterdeviceinventory/View/RegisterComplaint.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeviceDetailsView {
   void changeToCheckout({String key}) {}
-
   void changeToCheckin({String key}) {}
-
   void circularIndicator() {}
 }
 
@@ -27,25 +25,40 @@ class DeviceDetails extends StatefulWidget {
 
 class _DeviceDetailsState extends State<DeviceDetails>
     implements DeviceDetailsView {
-  final userData = UserData();
+  String user = 'Admin';
   Widget button;
 
   @override
   void initState() {
-    widget.presenter.setView = this;
-    setState(() {
-      button = setButton(key: widget.device.key, status: widget.device.status);
-    });
+    button = Container();
+    this.widget.presenter.setView = this;
+    getuser();
+    this.widget.presenter.getKey(widget.device.key);
     super.initState();
+  }
+
+  void getuser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String fetchedUser = prefs.getString('user');
+    setState(() {
+      if (fetchedUser == "Employee") {
+        button =
+            setButton(key: widget.device.key, status: widget.device.status);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Device Details'),
-          centerTitle: true,
-        ),
+            title: Text('Device Details'),
+            centerTitle: true,
+            leading: GestureDetector(
+                child: Icon(Icons.arrow_back),
+                onTap: () {
+                  Navigator.pop(context);
+                })),
         body: Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
@@ -111,14 +124,10 @@ class _DeviceDetailsState extends State<DeviceDetails>
   }
 
   Widget setButton({String key, String status}) {
-    if (userData.user == 'Admin') {
-      return Container();
+    if (status == 'Available') {
+      return checkInButton(key);
     } else {
-      if (status == 'Available') {
-        return checkInButton(key);
-      } else {
-        return checkOutButton(key);
-      }
+      return checkOutButton(key);
     }
   }
 
@@ -130,6 +139,15 @@ class _DeviceDetailsState extends State<DeviceDetails>
         this.widget.presenter.doCheckIn(key);
       },
       child: Text('Check-In'),
+    );
+  }
+
+  Widget issuedButton(String key) {
+    return RaisedButton(
+      color: Colors.blue,
+      textColor: Colors.white,
+      onPressed: () {},
+      child: Text('Issued'),
     );
   }
 
@@ -194,4 +212,6 @@ class _DeviceDetailsState extends State<DeviceDetails>
       Center(child: CircularProgressIndicator());
     });
   }
+
+  void goToBack() {}
 }

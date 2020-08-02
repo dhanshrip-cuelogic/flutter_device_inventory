@@ -1,14 +1,14 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
+import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/View/IssuedDeviceList.dart';
 
 class Presenter {
   set setView(IssuedDeviceView value) {}
-
-  void fetchDevices() {}
+  Future fetchDevices() {}
 }
 
 class IssuedPresenter implements Presenter {
-  List deviceList = [];
   IssuedDeviceView _view;
   DbManager _dbManager = DbManager();
 
@@ -18,8 +18,26 @@ class IssuedPresenter implements Presenter {
   }
 
   @override
-  void fetchDevices() async {
-    deviceList = await _dbManager.fetchIssuedDevices();
-    _view.refreshState(deviceList[0], deviceList[1]);
+  Future fetchDevices() async {
+    List<Device> availableDevices = [];
+    List<Device> issuedDevices = [];
+    List<Device> deviceLists = [];
+    DataSnapshot snapshot = await _dbManager.fetchDevices();
+
+    Map<dynamic, dynamic> values = snapshot.value;
+
+    values.forEach((key, value) {
+      deviceLists.add(Device.fromSnapshot(key, value));
+    });
+
+    for (Device device in deviceLists) {
+      if (device.status == "Available") {
+        availableDevices.add(device);
+      } else {
+        issuedDevices.add(device);
+      }
+    }
+
+    return [availableDevices, issuedDevices];
   }
 }

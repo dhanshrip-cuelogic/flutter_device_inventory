@@ -5,7 +5,9 @@ import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 
 class Presenter {
   set setView(SignInView value) {}
-  void validateAndLogin() {}
+
+  void validateAndLogin(
+      {@required String email, @required String password, @required appUser}) {}
 }
 
 class SignInPresenter implements Presenter {
@@ -19,14 +21,33 @@ class SignInPresenter implements Presenter {
 
   @override
   void validateAndLogin(
-      {@required String email, @required String password}) async {
-    FirebaseUser user = await _auth.signIn(email, password);
-    if (await _auth.isEmailVerified(user)) {
-      _view.clearFields();
-      _view.redirectToPlatformSelectionPage(user);
+      {@required String email,
+      @required String password,
+      @required appUser}) async {
+    // Check whether the user is in admin list or not.
+    var isValidUser = await _auth.checkUser(appUser, email);
+    if (isValidUser) {
+      signInUser(email, password);
     } else {
-      _view.clearFields();
-      _view.requestToVerify();
+      _view.showError("User not found");
+    }
+  }
+
+  void signInUser(String email, String password) async {
+    try {
+      FirebaseUser user = await _auth.signIn(email, password);
+
+      // add try - catch while verifying for email as well.
+      if (await _auth.isEmailVerified(user)) {
+        _view.clearFields();
+        _view.redirectToPlatformSelectionPage(user);
+      } else {
+        _view.clearFields();
+        _view.requestToVerify();
+      }
+    } catch (error) {
+      print(error);
+      _view.showError(error);
     }
   }
 }

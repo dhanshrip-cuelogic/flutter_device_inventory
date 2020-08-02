@@ -93,4 +93,10 @@ class _RegisterComplaintState extends State<RegisterComplaint>
       _commmentController.text = "";
     });
   }
+
+  @override
+  void dispose() {
+    _commmentController.dispose();
+    super.dispose();
+  }
 }

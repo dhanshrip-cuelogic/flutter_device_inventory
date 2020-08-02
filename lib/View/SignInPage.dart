@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterdeviceinventory/Model/UserData.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
 import 'package:flutterdeviceinventory/View/ForgotPassword.dart';
-
 import 'SignUpPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInView {
   void redirectToPlatformSelectionPage(FirebaseUser user) {}
   void clearFields() {}
   void requestToVerify() {}
+  void showError(String errorMessage) {}
 }
 
 class SignInPage extends StatefulWidget {
@@ -25,11 +25,21 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> implements SignInView {
   final _formKey = GlobalKey<FormState>();
+  String user;
 
   @override
   void initState() {
     this.widget.presenter.setView = this;
+    getuser();
     super.initState();
+  }
+
+  void getuser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String fetchedUser = prefs.getString('user');
+    setState(() {
+      user = fetchedUser;
+    });
   }
 
   final _emailController = TextEditingController();
@@ -75,7 +85,10 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
                   }
                 },
               ),
-              Text(error),
+              Text(
+                error,
+                style: TextStyle(color: Colors.red),
+              ),
               loginButton(),
               signUpButton(),
               forgotPassword(),
@@ -91,7 +104,9 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
       onPressed: () {
         if (_formKey.currentState.validate()) {
           this.widget.presenter.validateAndLogin(
-              email: _emailController.text, password: _passwordController.text);
+              email: _emailController.text,
+              password: _passwordController.text,
+              appUser: user);
         }
       },
       child: Text('Login'),
@@ -103,7 +118,7 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   }
 
   Widget signUpButton() {
-    if (userData.user == 'Employee') {
+    if (user == 'Employee') {
       return RaisedButton(
         onPressed: () {
           Navigator.push(
@@ -170,5 +185,19 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   void clearFields() {
     _emailController.text = '';
     _passwordController.text = '';
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void showError(String errorMessage) {
+    setState(() {
+      error = errorMessage;
+    });
   }
 }

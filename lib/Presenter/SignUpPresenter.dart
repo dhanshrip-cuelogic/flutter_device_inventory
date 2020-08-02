@@ -45,16 +45,16 @@ class SignUpPresenter implements Presenter {
       @required String password,
       @required String cueid,
       @required String username}) async {
-    FirebaseUser user = await _auth.signUp(email, password);
     try {
+      FirebaseUser user = await _auth.signUp(email, password);
+
       await user.sendEmailVerification();
       _auth.saveEmployeeData(
           userid: user.uid, email: email, cueid: cueid, username: username);
       _signUpView.clearFields();
       _signUpView.showVerifyEmailDialog();
-    } catch (e) {
-      print("An error occured while trying to send email verification");
-      print(e.message);
+    } catch (error) {
+      _signUpView.showError(error);
     }
   }
 }

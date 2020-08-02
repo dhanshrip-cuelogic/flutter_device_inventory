@@ -7,6 +7,7 @@ import 'SignInPage.dart';
 class SignUpView {
   void showVerifyEmailDialog() {}
   void clearFields() {}
+  void showError(String errorMessage) {}
 }
 
 class SignUpPage extends StatefulWidget {
@@ -26,6 +27,8 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
   final _cueidController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  String error = '';
 
   @override
   void initState() {
@@ -117,6 +120,10 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
                     return null;
                   },
                 ),
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red),
+                ),
                 signUpButton(),
                 Text('Already have an account?',
                     style: TextStyle(color: Colors.blue)),
@@ -203,5 +210,21 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
     _cueidController.text = '';
     _usernameController.text = '';
     _passwordController.text = '';
+  }
+
+  @override
+  void showError(String errorMessage) {
+    setState(() {
+      error = errorMessage;
+    });
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _usernameController.dispose();
+    _cueidController.dispose();
+    super.dispose();
   }
 }

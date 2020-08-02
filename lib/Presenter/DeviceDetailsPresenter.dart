@@ -4,6 +4,8 @@ import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
 class Presenter {
   set setView(DeviceDetailsView value) {}
 
+  void getKey(String key) {}
+
   void doCheckIn(String key) {}
 }
 
@@ -14,25 +16,36 @@ class DeviceDetailsPresenter implements Presenter {
   @override
   void set setView(DeviceDetailsView value) {
     _view = value;
+    // for getting issued user of device.
   }
 
   @override
   void doCheckIn(String key) {
-    _dbManager.saveCheckIn(key).then((value) {
+    try {
+      _dbManager.saveCheckIn(key);
       _dbManager.updateDeviceStatus(key, 'Issued');
       _view.changeToCheckout(key: key);
-    });
+    } catch (error) {
+      print("error while doing checkin ------ $error");
+    }
   }
 
   void doCheckOut(String key) async {
-    bool markedCheckout = await _dbManager.saveCheckOut(key);
-//    if (value == true) {
-//      print('Time to change checkout');
-//      _dbManager.updateDeviceStatus(key, "Available");
-//      _view.changeToCheckin(key: key);
-//    } else {
-//      print('Not changing now....');
-//      _view.circularIndicator();
-//    }
+    try {
+      _dbManager.saveCheckOut(key);
+      _dbManager.updateDeviceStatus(key, "Available");
+      _view.changeToCheckin(key: key);
+    } catch (error) {
+      print("error while doing checkout ------ $error");
+    }
+  }
+
+  @override
+  void getKey(String key) {
+    _dbManager.getDeviceHistory(key).then((value) {
+      print('got value------ $value');
+    }, onError: (error) {
+      print('got error');
+    });
   }
 }

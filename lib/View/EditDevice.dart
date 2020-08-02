@@ -127,6 +127,13 @@ class _EditDeviceState extends State<EditDevice> implements EditDeviceView {
       },
     );
   }
+
+  @override
+  void dispose() {
+    _osVersionController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
 }
 
 class EditDeviceView {}
