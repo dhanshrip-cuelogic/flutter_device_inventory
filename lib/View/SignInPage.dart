@@ -11,6 +11,8 @@ class SignInView {
   void clearFields() {}
   void requestToVerify() {}
   void showError(String errorMessage) {}
+  void dialogAfterLogin() {}
+  void popDialog() {}
 }
 
 class SignInPage extends StatefulWidget {
@@ -199,5 +201,23 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
     setState(() {
       error = errorMessage;
     });
+  }
+
+  @override
+  void dialogAfterLogin() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: new Text("Please wait..."),
+        );
+      },
+    );
+  }
+
+  @override
+  void popDialog() {
+    Navigator.of(context).pop();
   }
 }

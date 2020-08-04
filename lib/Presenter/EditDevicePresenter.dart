@@ -18,8 +18,13 @@ class EditDevicePresenter implements Presenter {
 
   @override
   void updateDevice(
-      {String key, String name, String osVersion, String status}) {
+      {String key,
+      String name,
+      String osVersion,
+      String status,
+      String platform}) {
     Device updatedDevice = Device(name, osVersion, status);
-    _dbManager.updateDevice(key: key, device: updatedDevice);
+    _dbManager.updateDevice(
+        key: key, device: updatedDevice, platform: platform);
   }
 }

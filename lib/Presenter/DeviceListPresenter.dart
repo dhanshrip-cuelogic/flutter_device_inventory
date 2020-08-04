@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
@@ -5,37 +7,56 @@ import 'package:flutterdeviceinventory/View/DeviceList.dart';
 
 class Presenter {
   set setView(DeviceListView value) {}
-  Future fetchDeviceData() {}
-  void deleteDevice(String key, int index) {}
+  Future fetchDeviceData(String platform) {}
+  void deleteDevice(String key, int index, String platform) {}
+  void presenterDispose() {}
 }
 
 class DeviceListPresenter implements Presenter {
   DeviceListView _view;
   DbManager _dbManager = DbManager();
+  StreamSubscription<Event> devicesEvent;
+  StreamSubscription<Event> devicesChangeEvent;
 
   @override
-  void set setView(value) {
+  void set setView(DeviceListView value) {
     _view = value;
   }
 
   @override
-  Future fetchDeviceData() async {
-    List<Device> devices = [];
+  Future fetchDeviceData(String platform) async {
+    List<Device> deviceList = [];
+    _dbManager.fetchDevices(platform).then((value) {
+      Query query = value;
+      devicesEvent = query.onChildAdded.listen((event) {
+        Device device = (Device.fromSnapshot(event.snapshot));
+        deviceList.add(device);
+        _view.refreshState(deviceList);
+      });
 
-    DataSnapshot snapshot = await _dbManager.fetchDevices();
-
-    Map<dynamic, dynamic> values = snapshot.value;
-
-    values.forEach((key, value) {
-      devices.add(Device.fromSnapshot(key, value));
+      devicesChangeEvent = query.onChildChanged.listen((event) {
+        Device device = (Device.fromSnapshot(event.snapshot));
+        print(device.deviceName);
+        _view.updateDeviceList(device);
+      });
     });
 
-    return devices;
+//    Map<dynamic, dynamic> values = snapshot.value;
+//
+//    values.forEach((key, value) {
+//      devices.add(Device.fromSnapshot(key, value));
+//    });
   }
 
   @override
-  void deleteDevice(String key, int index) {
-    _dbManager.deleteDevice(key: key);
+  void deleteDevice(String key, int index, String platform) {
+    _dbManager.deleteDevice(key: key, platform: platform);
     _view.removeDeviceFromList(index);
+  }
+
+  @override
+  void presenterDispose() {
+    devicesChangeEvent.cancel();
+    devicesEvent.cancel();
   }
 }

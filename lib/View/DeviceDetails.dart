@@ -4,20 +4,22 @@ import 'package:flutterdeviceinventory/Presenter/DeviceDetailsPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/RegisterComplaintPresenter.dart';
 import 'package:flutterdeviceinventory/View/DeviceHistoryPage.dart';
 import 'package:flutterdeviceinventory/View/RegisterComplaint.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DeviceDetailsView {
   void changeToCheckout({String key}) {}
+
   void changeToCheckin({String key}) {}
+  void changeToIssued({String key}) {}
+
   void circularIndicator() {}
 }
 
 class DeviceDetails extends StatefulWidget {
-  static const routeName = '/deviceDetails';
   final DeviceDetailsPresenter presenter;
   final Device device;
+  final platform;
 
-  DeviceDetails({this.presenter, this.device});
+  DeviceDetails({this.presenter, this.device, this.platform});
 
   @override
   _DeviceDetailsState createState() => _DeviceDetailsState();
@@ -26,26 +28,17 @@ class DeviceDetails extends StatefulWidget {
 class _DeviceDetailsState extends State<DeviceDetails>
     implements DeviceDetailsView {
   String user = 'Admin';
-  Widget button;
+  Widget button = Container();
 
   @override
   void initState() {
     button = Container();
     this.widget.presenter.setView = this;
-    getuser();
-    this.widget.presenter.getKey(widget.device.key);
+    this
+        .widget
+        .presenter
+        .getuser(this.widget.device.key, this.widget.device.status);
     super.initState();
-  }
-
-  void getuser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String fetchedUser = prefs.getString('user');
-    setState(() {
-      if (fetchedUser == "Employee") {
-        button =
-            setButton(key: widget.device.key, status: widget.device.status);
-      }
-    });
   }
 
   @override
@@ -123,26 +116,18 @@ class _DeviceDetailsState extends State<DeviceDetails>
     );
   }
 
-  Widget setButton({String key, String status}) {
-    if (status == 'Available') {
-      return checkInButton(key);
-    } else {
-      return checkOutButton(key);
-    }
-  }
-
   Widget checkInButton(String key) {
     return RaisedButton(
       color: Colors.green,
       textColor: Colors.white,
       onPressed: () {
-        this.widget.presenter.doCheckIn(key);
+        this.widget.presenter.doCheckIn(key, this.widget.platform);
       },
       child: Text('Check-In'),
     );
   }
 
-  Widget issuedButton(String key) {
+  Widget issuedButton() {
     return RaisedButton(
       color: Colors.blue,
       textColor: Colors.white,
@@ -156,7 +141,7 @@ class _DeviceDetailsState extends State<DeviceDetails>
       color: Colors.red,
       textColor: Colors.white,
       onPressed: () {
-        widget.presenter.doCheckOut(key);
+        widget.presenter.doCheckOut(key, this.widget.platform);
       },
       child: Text('Check-Out'),
     );
@@ -206,6 +191,13 @@ class _DeviceDetailsState extends State<DeviceDetails>
   }
 
   @override
+  void changeToIssued({String key}) {
+    setState(() {
+      button = issuedButton();
+    });
+  }
+
+  @override
   void circularIndicator() {
     print('Need to show circular indicator');
     setState(() {
@@ -213,5 +205,9 @@ class _DeviceDetailsState extends State<DeviceDetails>
     });
   }
 
-  void goToBack() {}
+  @override
+  void dispose() {
+//    this.widget.presenter.presenterDispose();
+    super.dispose();
+  }
 }

@@ -6,6 +6,10 @@ import 'DeviceList.dart';
 import 'IssuedDeviceList.dart';
 
 class SelectListPath extends StatefulWidget {
+  final platform;
+
+  SelectListPath({this.platform});
+
   @override
   _SelectListPathState createState() => _SelectListPathState();
 }
@@ -21,9 +25,11 @@ class _SelectListPathState extends State<SelectListPath> {
   @override
   Widget build(BuildContext context) {
     if (user == 'Employee') {
-      return IssuedDeviceList(presenter: IssuedPresenter());
+      return IssuedDeviceList(
+          presenter: IssuedPresenter(), platform: this.widget.platform);
     } else {
-      return DeviceList(presenter: DeviceListPresenter());
+      return DeviceList(
+          presenter: DeviceListPresenter(), platform: this.widget.platform);
     }
   }
 

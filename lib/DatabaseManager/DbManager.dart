@@ -16,8 +16,6 @@ class DbManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
 
-  StreamSubscription<Event> onUpdateDevices;
-
   Future signIn(String email, String password) async {
     String errorMessage;
     FirebaseUser user;
@@ -70,18 +68,26 @@ class DbManager {
     return user;
   }
 
-  Future<FirebaseUser> getCurrentUser() async {
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    return user;
-  }
-
   Future<void> signOut() async {
     return _firebaseAuth.signOut();
+  }
+
+  @override
+  Future resetPassword(String email) async {
+    var result = await _firebaseAuth.sendPasswordResetEmail(email: email);
+    return result;
   }
 
   Future<bool> isEmailVerified(FirebaseUser user) async {
     return user.isEmailVerified;
   }
+
+  Future<FirebaseUser> getCurrentUser() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    return user;
+  }
+
+  //  Add new Employee into database.
 
   Future saveEmployeeData(
       {String userid, String email, String cueid, String username}) {
@@ -93,46 +99,74 @@ class DbManager {
         .set(employee.toJson());
   }
 
-  Future saveDeviceData({String deviceName, String osVersion}) {
+  //   Add new device into database.
+
+  Future saveDeviceData(
+      {String deviceName, String osVersion, String platform}) {
     var status = 'Available';
     Device device = Device(deviceName, osVersion, status);
-    _database.reference().child('AndroidDevices').push().set(device.toJson());
+    if (platform == "Android") {
+      _database.reference().child('AndroidDevices').push().set(device.toJson());
+    } else {
+      _database.reference().child('iOSDevices').push().set(device.toJson());
+    }
   }
 
   //   Fetching devices from firebase
 
-  Future fetchDevices() async {
-    var snapshot =
-        await _database.reference().child('AndroidDevices').orderByKey().once();
+  Future fetchDevices(String platform) async {
+    var snapshot;
+    if (platform == "Android") {
+      snapshot =
+          await _database.reference().child('AndroidDevices').orderByKey();
+    } else {
+      snapshot = await _database.reference().child('iOSDevices').orderByKey();
+    }
     return snapshot;
   }
 
   //  Update device data by Admin
 
-  void updateDevice({Device device, String key}) {
-    _database
-        .reference()
-        .child('AndroidDevices')
-        .child(key)
-        .set(device.toJson());
+  void updateDevice({Device device, String key, String platform}) {
+    if (platform == "Android") {
+      _database
+          .reference()
+          .child('AndroidDevices')
+          .child(key)
+          .set(device.toJson());
+    } else {
+      _database.reference().child('iOSDevices').child(key).set(device.toJson());
+    }
   }
 
-  bool deleteDevice({String key}) {
-    _database
-        .reference()
-        .child('AndroidDevices')
-        .child(key)
-        .remove()
-        .then((value) => true);
+  //  Delete device data by Admin
+
+  bool deleteDevice({String key, String platform}) {
+    if (platform == "Android") {
+      _database.reference().child('AndroidDevices').child(key).remove();
+    } else {
+      _database.reference().child('iOSDevices').child(key).remove();
+    }
   }
 
-  void updateDeviceStatus(String key, String status) {
-    _database
-        .reference()
-        .child('AndroidDevices')
-        .child(key)
-        .child('status')
-        .set(status);
+  //  Update device status after check-in or check-out
+
+  void updateDeviceStatus(String key, String status, String platform) {
+    if (platform == "Android") {
+      _database
+          .reference()
+          .child('AndroidDevices')
+          .child(key)
+          .child('status')
+          .set(status);
+    } else {
+      _database
+          .reference()
+          .child('iOSDevices')
+          .child(key)
+          .child('status')
+          .set(status);
+    }
   }
 
   //   Save check-in time of device with user.
@@ -183,25 +217,17 @@ class DbManager {
     });
   }
 
-  Future<List<DeviceHistory>> getDeviceHistory(String key) async {
-    List<DeviceHistory> history = [];
-    StreamSubscription<Event> _onDeviceHistory = await _database
+  Future getDeviceHistory(String key) async {
+    return await _database
         .reference()
         .child('HistoryTable')
         .orderByChild('deviceKey')
-        .equalTo(key)
-        .onChildAdded
-        .listen((event) {
-      DeviceHistory device = DeviceHistory.fromSnapshot(event.snapshot);
-      history.add(device);
-    });
-    return history;
-  }
-
-  @override
-  Future<void> resetPassword(String email) async {
-    var result = await _firebaseAuth.sendPasswordResetEmail(email: email);
-    return result;
+        .equalTo(key);
+//        .onChildAdded
+//        .listen((event) {
+//      DeviceHistory device = DeviceHistory.fromSnapshot(event.snapshot);
+//      history.add(device);
+//    })
   }
 
   Future<bool> checkUser(String user, String email) async {
@@ -214,12 +240,8 @@ class DbManager {
           .equalTo(email)
           .once();
       if (snapshot.value == null) {
-        print(
-            "Snapshot got null value from admin table.-------- ${snapshot.value}");
         return false;
       } else {
-        print(
-            "Snapshot got some value from admin table.-------- ${snapshot.value}");
         return true;
       }
     } else if (user == "Employee") {
@@ -231,14 +253,19 @@ class DbManager {
           .equalTo(email)
           .once();
       if (snapshot.value == null) {
-        print(
-            "Snapshot got null value from employee table.-------- ${snapshot.value}");
         return false;
       } else {
-        print(
-            "Snapshot got some value from employee table.-------- ${snapshot.value}");
         return true;
       }
     }
+  }
+
+  Future getIssuedUser(String key) async {
+    var snapshot = await _database
+        .reference()
+        .child('HistoryTable')
+        .orderByChild("check-out")
+        .equalTo("-- --");
+    return snapshot;
   }
 }

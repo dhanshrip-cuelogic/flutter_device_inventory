@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -51,22 +52,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   }
 
   void resetPassword() async {
-    await _auth.resetPassword(_emailController.text);
-    setState(() {
-      _emailController.text = "";
-      showAlertDialog();
+    _auth.resetPassword(_emailController.text).catchError((onError) {
+      PlatformException error = onError;
+      setState(() {
+        _emailController.text = "";
+        print("-- ${error.message}");
+      });
+    }).then((value) {
+      setState(() {
+        _emailController.text = "";
+        showAlertDialog("Reset link sent",
+            "Link has been already sent to your email account please follow the instructions to reset password.");
+      });
     });
   }
 
-  void showAlertDialog() {
+  void showAlertDialog(String title, String content) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Reset link sent"),
-          content: new Text(
-              "Link has been already sent to your email account please follow the instructions to reset password."),
+          title: new Text(title),
+          content: new Text(content),
           actions: <Widget>[
             new FlatButton(
               child: new Text("Dismiss"),

@@ -1,3 +1,5 @@
+import 'package:firebase_database/firebase_database.dart';
+
 class Device {
   String key;
   String deviceName;
@@ -6,11 +8,11 @@ class Device {
 
   Device(this.deviceName, this.osVersion, this.status);
 
-  Device.fromSnapshot(key, value)
-      : key = key,
-        deviceName = value["deviceName"],
-        osVersion = value["osVersion"],
-        status = value["status"];
+  Device.fromSnapshot(DataSnapshot snapshot)
+      : key = snapshot.key,
+        deviceName = snapshot.value["deviceName"],
+        osVersion = snapshot.value["osVersion"],
+        status = snapshot.value["status"];
 
   toJson() {
     return {

@@ -16,8 +16,9 @@ class AddDevicePresenter implements Presenter {
   }
 
   @override
-  void saveDeviceData({String deviceName, String osVersion}) {
-    _auth.saveDeviceData(deviceName: deviceName, osVersion: osVersion);
+  void saveDeviceData({String deviceName, String osVersion, String platform}) {
+    _auth.saveDeviceData(
+        deviceName: deviceName, osVersion: osVersion, platform: platform);
     _view.successfulDialog();
   }
 }

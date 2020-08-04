@@ -4,8 +4,10 @@ import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
 
 class EditDevice extends StatefulWidget {
   final EditDevicePresenter presenter;
+  final device;
+  final platform;
 
-  EditDevice({this.presenter});
+  EditDevice({this.presenter, this.device, this.platform});
 
   @override
   _EditDeviceState createState() => _EditDeviceState();
@@ -23,9 +25,10 @@ class _EditDeviceState extends State<EditDevice> implements EditDeviceView {
 
   @override
   Widget build(BuildContext context) {
-    Device device = ModalRoute.of(context).settings.arguments;
-    _nameController = TextEditingController(text: device.deviceName);
-    _osVersionController = TextEditingController(text: device.osVersion);
+    _nameController =
+        TextEditingController(text: this.widget.device.deviceName);
+    _osVersionController =
+        TextEditingController(text: this.widget.device.osVersion);
 
     return Scaffold(
       appBar: AppBar(
@@ -37,10 +40,11 @@ class _EditDeviceState extends State<EditDevice> implements EditDeviceView {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            deviceID(device.key),
+            deviceID(this.widget.device.key),
             deviceName(_nameController),
             osVersion(_osVersionController),
-            saveButton(key: device.key, status: device.status),
+            saveButton(
+                key: this.widget.device.key, status: this.widget.device.status),
           ],
         ),
       ),
@@ -100,7 +104,8 @@ class _EditDeviceState extends State<EditDevice> implements EditDeviceView {
             key: key,
             name: _nameController.text,
             osVersion: _osVersionController.text,
-            status: status);
+            status: status,
+            platform: this.widget.platform);
         updateSuccessfulDialog();
       },
       child: Text('Save'),
@@ -119,7 +124,7 @@ class _EditDeviceState extends State<EditDevice> implements EditDeviceView {
             new FlatButton(
               child: new Text("Dismiss"),
               onPressed: () {
-                Navigator.of(context).popAndPushNamed('/deviceList');
+                Navigator.pop(context);
               },
             ),
           ],

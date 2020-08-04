@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutterdeviceinventory/Presenter/DeviceDetailsPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/IssuedDevicePresenter.dart';
 import 'package:flutterdeviceinventory/View/IssuedDeviceList.dart';
 import 'DatabaseManager/DbManager.dart';
-import 'Model/DeviceDataModel.dart';
 import 'Presenter/AddDevicePresenter.dart';
 import 'Presenter/DeviceListPresenter.dart';
 import 'Presenter/EditDevicePresenter.dart';
 import 'Presenter/PlatformSelectionPresenter.dart';
 import 'Presenter/SignUpPresenter.dart';
-import 'View/DeviceDetails.dart';
 import 'View/DeviceList.dart';
 import 'View/RootPage.dart';
 import 'View/SignUpPage.dart';
@@ -43,16 +40,6 @@ class MyApp extends StatelessWidget {
             EditDevice(presenter: EditDevicePresenter()),
         '/issuedDeviceList': (BuildContext context) =>
             IssuedDeviceList(presenter: IssuedPresenter()),
-      },
-      onGenerateRoute: (setting) {
-        if (setting.name == DeviceDetails.routeName) {
-          final Device device = setting.arguments;
-          return MaterialPageRoute(
-              builder: (BuildContext context) => DeviceDetails(
-                    presenter: DeviceDetailsPresenter(),
-                    device: device,
-                  ));
-        }
       },
     );
   }

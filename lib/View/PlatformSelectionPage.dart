@@ -57,7 +57,7 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
             leading: Icon(Icons.mobile_screen_share),
             title: Text(_model.platforms[index]),
             onTap: () {
-              _redirectToDeviceList();
+              _redirectToDeviceList(_model.platforms[index]);
             },
           );
         },
@@ -73,9 +73,11 @@ class _PlatformSelectionPageState extends State<PlatformSelectionPage>
     });
   }
 
-  void _redirectToDeviceList() {
+  void _redirectToDeviceList(String platform) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SelectListPath()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => SelectListPath(platform: platform)));
   }
 
   void removeUser() async {

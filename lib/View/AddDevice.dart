@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/AddDevicePresenter.dart';
+import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
+
+import 'DeviceList.dart';
 
 class AddDevice extends StatefulWidget {
   final AddDevicePresenter presenter;
+  final platform;
 
-  AddDevice({this.presenter});
+  AddDevice({this.presenter, this.platform});
 
   @override
   _AddDeviceState createState() => _AddDeviceState();
@@ -71,8 +75,10 @@ class _AddDeviceState extends State<AddDevice> implements AddDeviceView {
     return RaisedButton(
       onPressed: () {
         this.widget.presenter.saveDeviceData(
-            deviceName: _deviceNameController.text,
-            osVersion: _osVersionController.text);
+              deviceName: _deviceNameController.text,
+              osVersion: _osVersionController.text,
+              platform: this.widget.platform,
+            );
       },
       child: Text('Save'),
     );
@@ -90,7 +96,9 @@ class _AddDeviceState extends State<AddDevice> implements AddDeviceView {
             new FlatButton(
               child: new Text("Dismiss"),
               onPressed: () {
-                Navigator.of(context).popAndPushNamed('/deviceList');
+                _osVersionController.text = "";
+                _deviceNameController.text = "";
+                Navigator.pop(context);
               },
             ),
           ],

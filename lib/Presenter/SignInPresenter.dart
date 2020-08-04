@@ -35,17 +35,20 @@ class SignInPresenter implements Presenter {
 
   void signInUser(String email, String password) async {
     try {
+      _view.dialogAfterLogin();
       FirebaseUser user = await _auth.signIn(email, password);
-
       // add try - catch while verifying for email as well.
       if (await _auth.isEmailVerified(user)) {
+        _view.popDialog();
         _view.clearFields();
         _view.redirectToPlatformSelectionPage(user);
       } else {
+        _view.popDialog();
         _view.clearFields();
         _view.requestToVerify();
       }
     } catch (error) {
+      _view.popDialog();
       print(error);
       _view.showError(error);
     }
