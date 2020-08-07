@@ -7,6 +7,8 @@ import 'SignInPage.dart';
 class SignUpView {
   void showVerifyEmailDialog() {}
   void clearFields() {}
+  void dialogAfterSignUp() {}
+  void popDialog() {}
   void showError(String errorMessage) {}
 }
 
@@ -189,13 +191,8 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
             new FlatButton(
               child: new Text("Dismiss"),
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SignInPage(
-                              presenter: SignInPresenter(),
-                              signedIn: signedIn,
-                            )));
+                Navigator.pop(context);
+                popDialog();
               },
             ),
           ],
@@ -217,6 +214,24 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
     setState(() {
       error = errorMessage;
     });
+  }
+
+  @override
+  void dialogAfterSignUp() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          content: new Text("Please wait..."),
+        );
+      },
+    );
+  }
+
+  @override
+  void popDialog() {
+    Navigator.of(context).pop();
   }
 
   @override

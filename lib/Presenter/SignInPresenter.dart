@@ -49,7 +49,6 @@ class SignInPresenter implements Presenter {
       }
     } catch (error) {
       _view.popDialog();
-      print(error);
       _view.showError(error);
     }
   }

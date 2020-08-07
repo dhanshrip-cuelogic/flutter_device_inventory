@@ -16,6 +16,8 @@ class DbManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
 
+  //  Sign-in using firebase authentication.
+
   Future signIn(String email, String password) async {
     String errorMessage;
     FirebaseUser user;
@@ -40,9 +42,10 @@ class DbManager {
       }
       throw errorMessage;
     }
-
     return user;
   }
+
+  //  Sign-up using firebase authentication.
 
   Future signUp(String email, String password) async {
     String errorMessage;
@@ -68,9 +71,13 @@ class DbManager {
     return user;
   }
 
+  //  Sign-out
+
   Future<void> signOut() async {
     return _firebaseAuth.signOut();
   }
+
+  //  send reset password link using firebase authentication.
 
   @override
   Future resetPassword(String email) async {
@@ -78,9 +85,13 @@ class DbManager {
     return result;
   }
 
+  //  check whether user email is verified or not.
+
   Future<bool> isEmailVerified(FirebaseUser user) async {
     return user.isEmailVerified;
   }
+
+  //  get current user.
 
   Future<FirebaseUser> getCurrentUser() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
@@ -189,7 +200,6 @@ class DbManager {
   //   Save check-out time of device with user.
 
   void saveCheckOut(String key) async {
-    bool isDone = false;
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('h:mm a, EEE, d MMM y').format(now);
 
@@ -217,18 +227,17 @@ class DbManager {
     });
   }
 
+  //  Get history of a particular issued device.
+
   Future getDeviceHistory(String key) async {
     return await _database
         .reference()
         .child('HistoryTable')
         .orderByChild('deviceKey')
         .equalTo(key);
-//        .onChildAdded
-//        .listen((event) {
-//      DeviceHistory device = DeviceHistory.fromSnapshot(event.snapshot);
-//      history.add(device);
-//    })
   }
+
+  //  check whether the user is present in database or not.
 
   Future<bool> checkUser(String user, String email) async {
     if (user == "Admin") {
@@ -259,6 +268,8 @@ class DbManager {
       }
     }
   }
+
+  //  Get the user who has issued the device.
 
   Future getIssuedUser(String key) async {
     var snapshot = await _database

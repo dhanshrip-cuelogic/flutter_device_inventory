@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
@@ -48,20 +47,6 @@ class IssuedPresenter implements Presenter {
         print(device.deviceName);
         _view.updateDeviceList(device);
       });
-
-//      Map<dynamic, dynamic> values = snapshot.value;
-//
-//      values.forEach((key, value) {
-//        deviceLists.add(Device.fromSnapshot(key, value));
-//      });
-//
-//      for (Device device in deviceLists) {
-//        if (device.status == "Available") {
-//          availableDevices.add(device);
-//        } else {
-//          issuedDevices.add(device);
-//        }
-//      }
     });
 
     availableList = availableDevices;

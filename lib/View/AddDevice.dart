@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/AddDevicePresenter.dart';
-import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
-
-import 'DeviceList.dart';
 
 class AddDevice extends StatefulWidget {
   final AddDevicePresenter presenter;

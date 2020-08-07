@@ -46,6 +46,7 @@ class SignUpPresenter implements Presenter {
       @required String cueid,
       @required String username}) async {
     try {
+      _signUpView.dialogAfterSignUp();
       FirebaseUser user = await _auth.signUp(email, password);
 
       await user.sendEmailVerification();
@@ -54,6 +55,7 @@ class SignUpPresenter implements Presenter {
       _signUpView.clearFields();
       _signUpView.showVerifyEmailDialog();
     } catch (error) {
+      _signUpView.popDialog();
       _signUpView.showError(error);
     }
   }

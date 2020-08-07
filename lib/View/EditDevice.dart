@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
 
 class EditDevice extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,9 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class Presenter {
   set setView(DeviceDetailsView value) {}
-
   void doCheckIn(String key, String platform) {}
-
   void doCheckOut(String key, String platform) {}
   void getuser(String key, String status) {}
   void presenterDispose() {}
@@ -25,7 +22,6 @@ class DeviceDetailsPresenter implements Presenter {
   @override
   void set setView(DeviceDetailsView value) {
     _view = value;
-    // for getting issued user of device.
   }
 
   @override

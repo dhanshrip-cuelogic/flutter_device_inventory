@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
 import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/Presenter/AddDevicePresenter.dart';
@@ -8,6 +9,7 @@ import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
 import 'package:flutterdeviceinventory/View/AddDevice.dart';
 import 'package:flutterdeviceinventory/View/EditDevice.dart';
 import 'DeviceDetails.dart';
+import 'dart:async';
 
 class DeviceList extends StatefulWidget {
   final DeviceListPresenter presenter;
@@ -21,11 +23,21 @@ class DeviceList extends StatefulWidget {
 
 class _DeviceListState extends State<DeviceList> implements DeviceListView {
   List<Device> devices = [];
+  StreamSubscription<Event> devicesEvent;
+  StreamSubscription<Event> devicesChangeEvent;
+  DbManager _dbManager = DbManager();
 
   @override
   void initState() {
     this.widget.presenter.setView = this;
-    this.widget.presenter.fetchDeviceData(this.widget.platform);
+    _dbManager.fetchDevices(widget.platform).then((value) {
+      Query query = value;
+      devicesEvent =
+          query.onChildAdded.listen(this.widget.presenter.childAddedEvent);
+      devicesChangeEvent =
+          query.onChildChanged.listen(this.widget.presenter.childUpdatedEvent);
+    });
+
     super.initState();
   }
 
@@ -76,45 +88,6 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
         separatorBuilder: (context, index) => Divider(),
         itemCount: devices.length,
       ),
-//      FutureBuilder(
-//        future: widget.presenter.fetchDeviceData(this.widget.platform),
-//        builder: (context, snapshot) {
-//          if (snapshot.connectionState == ConnectionState.none ||
-//              snapshot.data == null) {
-//            return Center(
-//              child: CircularProgressIndicator(),
-//            );
-//          }
-//
-//          devices = snapshot.data;
-//          return ListView.separated(
-//            itemBuilder: (context, index) {
-//              return ListTile(
-//                title: Text(devices[index].deviceName),
-//                trailing: Row(
-//                  mainAxisSize: MainAxisSize.min,
-//                  children: <Widget>[
-//                    showEditIcon(devices[index]),
-//                    showDeleteIcon(devices[index].key, index),
-//                  ],
-//                ),
-//                onTap: () {
-//                  Navigator.push(
-//                      context,
-//                      MaterialPageRoute(
-//                          builder: (BuildContext context) => DeviceDetails(
-//                                presenter: DeviceDetailsPresenter(),
-//                                device: devices[index],
-//                                platform: this.widget.platform,
-//                              )));
-//                },
-//              );
-//            },
-//            separatorBuilder: (context, index) => Divider(),
-//            itemCount: devices.length,
-//          );
-//        },
-//      ),
     );
   }
 
@@ -168,7 +141,10 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
         color: Colors.red,
       ),
       onTap: () {
-        this.widget.presenter.deleteDevice(key, index, this.widget.platform);
+        this
+            .widget
+            .presenter
+            .deleteDevice(key, index, this.widget.platform, this);
       },
     );
   }
@@ -195,7 +171,7 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
   }
 
   @override
-  void removeDeviceFromList(int index) {
+  void removeDevice(int index) {
     devices.removeAt(index);
     deleteSuccessfulDialog();
     refreshState(devices);
@@ -203,14 +179,14 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
 
   @override
   void dispose() {
-    this.widget.presenter.presenterDispose();
+    devicesEvent.cancel();
+    devicesChangeEvent.cancel();
     super.dispose();
   }
 }
 
 class DeviceListView {
   void refreshState(List<Device> deviceList) {}
-
-  void removeDeviceFromList(int index) {}
   void updateDeviceList(Device updatedDevice) {}
+  void removeDevice(int index) {}
 }

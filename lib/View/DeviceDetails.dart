@@ -7,10 +7,8 @@ import 'package:flutterdeviceinventory/View/RegisterComplaint.dart';
 
 class DeviceDetailsView {
   void changeToCheckout({String key}) {}
-
   void changeToCheckin({String key}) {}
   void changeToIssued({String key}) {}
-
   void circularIndicator() {}
 }
 
@@ -207,7 +205,6 @@ class _DeviceDetailsState extends State<DeviceDetails>
 
   @override
   void dispose() {
-//    this.widget.presenter.presenterDispose();
     super.dispose();
   }
 }
