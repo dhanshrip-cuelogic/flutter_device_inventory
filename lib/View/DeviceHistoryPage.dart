@@ -17,9 +17,11 @@ class _DeviceHistoryPageState extends State<DeviceHistoryPage> {
   DbManager _dbManager = DbManager();
   List<DeviceHistory> deviceHistory = [];
   StreamSubscription<Event> historyEvent;
+  Widget viewBody;
 
   @override
   void initState() {
+    viewBody = Container(child: Center(child: CircularProgressIndicator()));
     fetchDeviceHistory();
     super.initState();
   }
@@ -31,43 +33,48 @@ class _DeviceHistoryPageState extends State<DeviceHistoryPage> {
         title: Text('Device History'),
         centerTitle: true,
       ),
-      body: ListView.separated(
-        itemCount: deviceHistory.length,
-        separatorBuilder: (context, index) => Divider(),
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Column(
-              children: <Widget>[
-                // Name row,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text('User'),
-                    Text(deviceHistory[index].user),
-                  ],
-                ),
-                // Checkin row,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text('Checkin'),
-                    Text(deviceHistory[index].checkin),
-                  ],
-                ),
-                // Checkout row,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text('Checkout'),
-                    Text(deviceHistory[index].checkout),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+      body: viewBody,
+    );
+  }
+
+  Widget createList() {
+    return ListView.separated(
+      reverse: true,
+      itemCount: deviceHistory.length,
+      separatorBuilder: (context, index) => Divider(),
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Column(
+            children: <Widget>[
+              // Name row,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('User'),
+                  Text(deviceHistory[index].user),
+                ],
+              ),
+              // Checkin row,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('Checkin'),
+                  Text(deviceHistory[index].checkin),
+                ],
+              ),
+              // Checkout row,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text('Checkout'),
+                  Text(deviceHistory[index].checkout),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -77,6 +84,7 @@ class _DeviceHistoryPageState extends State<DeviceHistoryPage> {
       historyEvent = query.onChildAdded.listen((event) {
         DeviceHistory deviceData = DeviceHistory.fromSnapshot(event.snapshot);
         setState(() {
+          viewBody = createList();
           deviceHistory.add(deviceData);
         });
       });

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/RegisterComplaintPresenter.dart';
 
+import 'AlertDialogClass.dart';
+
 class RegisterComplaintView {
   void clearFields() {}
+
   void showErrorDialog(Error error) {}
 }
 
@@ -19,6 +22,7 @@ class RegisterComplaint extends StatefulWidget {
 class _RegisterComplaintState extends State<RegisterComplaint>
     implements RegisterComplaintView {
   TextEditingController _commmentController = TextEditingController();
+  AlertDialogClass alertDialogClass;
 
   @override
   void initState() {
@@ -28,6 +32,7 @@ class _RegisterComplaintState extends State<RegisterComplaint>
 
   @override
   Widget build(BuildContext context) {
+    alertDialogClass = AlertDialogClass(context);
     return Scaffold(
       appBar: AppBar(title: Text('Send mail')),
       body: Center(
@@ -67,24 +72,13 @@ class _RegisterComplaintState extends State<RegisterComplaint>
   }
 
   void showErrorDialog(Error error) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Verify your account"),
-          content: new Text("Please verify account in the link sent to email"),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+    alertDialogClass.displayAlertDialog(
+        "Verify your account",
+        "Please verify account in the link sent to email",
+        true,
+        () {},
+        false,
+        () {});
   }
 
   @override

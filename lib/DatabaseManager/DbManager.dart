@@ -15,6 +15,7 @@ enum AuthStatus {
 class DbManager {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
+  StreamSubscription<Event> _onDevice;
 
   //  Sign-in using firebase authentication.
 
@@ -55,6 +56,7 @@ class DbManager {
           email: email, password: password);
       user = result.user;
     } on PlatformException catch (error) {
+      print("error-- $error");
       switch (error.code) {
         case "ERROR_EMAIL_ALREADY_IN_USE":
           errorMessage = "Email already in use.";
@@ -113,9 +115,17 @@ class DbManager {
   //   Add new device into database.
 
   Future saveDeviceData(
-      {String deviceName, String osVersion, String platform}) {
+      {String deviceName,
+      String osVersion,
+      String display,
+      String ram,
+      String processor,
+      String platform}) {
     var status = 'Available';
-    Device device = Device(deviceName, osVersion, status);
+    var issuedUser = "--";
+    var checkin = "--";
+    Device device = Device(deviceName, osVersion, status, issuedUser, checkin,
+        display, ram, processor);
     if (platform == "Android") {
       _database.reference().child('AndroidDevices').push().set(device.toJson());
     } else {
@@ -162,22 +172,57 @@ class DbManager {
 
   //  Update device status after check-in or check-out
 
-  void updateDeviceStatus(String key, String status, String platform) {
-    if (platform == "Android") {
-      _database
-          .reference()
-          .child('AndroidDevices')
-          .child(key)
-          .child('status')
-          .set(status);
-    } else {
-      _database
-          .reference()
-          .child('iOSDevices')
-          .child(key)
-          .child('status')
-          .set(status);
-    }
+  void updateDeviceStatus(Device device, String status, String platform) async {
+    FirebaseUser user = await getCurrentUser();
+    String name;
+
+    _database
+        .reference()
+        .child("Employee")
+        .orderByChild("email")
+        .equalTo(user.email)
+        .once()
+        .then((snapshot) {
+      if (snapshot.value != null) {
+        Map<dynamic, dynamic> map = snapshot.value;
+        map.values.forEach((element) {
+          name = element["username"];
+        });
+
+        DateTime now = DateTime.now();
+        String formattedDate = DateFormat('h:mm a, d MMM y').format(now);
+        Device updatedDevice;
+
+        if (status == "Issued") {
+          updatedDevice = Device(
+              device.deviceName,
+              device.osVersion,
+              status,
+              name,
+              formattedDate,
+              device.display,
+              device.ram,
+              device.processor);
+        } else {
+          updatedDevice = Device(device.deviceName, device.osVersion, status,
+              "--", "--", device.display, device.ram, device.processor);
+        }
+
+        if (platform == "Android") {
+          _database
+              .reference()
+              .child('AndroidDevices')
+              .child(device.key)
+              .set(updatedDevice.toJson());
+        } else {
+          _database
+              .reference()
+              .child('iOSDevices')
+              .child(device.key)
+              .set(updatedDevice.toJson());
+        }
+      }
+    });
   }
 
   //   Save check-in time of device with user.
@@ -203,7 +248,7 @@ class DbManager {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('h:mm a, EEE, d MMM y').format(now);
 
-    StreamSubscription<Event> _onDevice = await _database
+    _onDevice = await _database
         .reference()
         .child('HistoryTable')
         .orderByChild('check-out')
@@ -223,8 +268,14 @@ class DbManager {
             .child('HistoryTable')
             .child(device.key)
             .set(newDevice.toJson());
+
+        cancelSubscription();
       }
     });
+  }
+
+  void cancelSubscription() {
+    _onDevice.cancel();
   }
 
   //  Get history of a particular issued device.
@@ -240,43 +291,62 @@ class DbManager {
   //  check whether the user is present in database or not.
 
   Future<bool> checkUser(String user, String email) async {
-    if (user == "Admin") {
-      // check user from Admin Table
-      var snapshot = await _database
-          .reference()
-          .child("Admin")
-          .orderByChild("email")
-          .equalTo(email)
-          .once();
-      if (snapshot.value == null) {
-        return false;
-      } else {
-        return true;
+    try {
+      if (user == "Admin") {
+        // check user from Admin Table
+        var snapshot = await _database
+            .reference()
+            .child("Admin")
+            .orderByChild("email")
+            .equalTo(email)
+            .once();
+        if (snapshot.value == null) {
+          return false;
+        } else {
+          return true;
+        }
+      } else if (user == "Employee") {
+        // Check user from Employee Table
+        var snapshot = await _database
+            .reference()
+            .child("Employee")
+            .orderByChild("email")
+            .equalTo(email)
+            .once();
+        if (snapshot.value == null) {
+          return false;
+        } else {
+          return true;
+        }
       }
-    } else if (user == "Employee") {
-      // Check user from Employee Table
-      var snapshot = await _database
-          .reference()
-          .child("Employee")
-          .orderByChild("email")
-          .equalTo(email)
-          .once();
-      if (snapshot.value == null) {
-        return false;
-      } else {
-        return true;
-      }
+    } catch (error) {
+      print(error);
+//      throw error;
     }
   }
 
   //  Get the user who has issued the device.
 
-  Future getIssuedUser(String key) async {
+  Future getIssuedUser() async {
     var snapshot = await _database
         .reference()
         .child('HistoryTable')
         .orderByChild("check-out")
         .equalTo("-- --");
     return snapshot;
+  }
+
+  Future<bool> checkCueID(String cueId) async {
+    var snapshot = await _database
+        .reference()
+        .child("Employee")
+        .orderByChild("cueid")
+        .equalTo(cueId)
+        .once();
+    if (snapshot.value == null) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

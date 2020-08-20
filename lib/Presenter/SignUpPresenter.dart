@@ -27,7 +27,7 @@ class SignUpPresenter implements Presenter {
   }
 
   bool validateCueID({String cueId}) {
-    RegExp exp = new RegExp(r"^(Cue)([0-9]{5})$");
+    RegExp exp = new RegExp(r"^(Cue)([0-9]{3})$");
     String str = cueId;
     return exp.hasMatch(str);
   }
@@ -47,13 +47,20 @@ class SignUpPresenter implements Presenter {
       @required String username}) async {
     try {
       _signUpView.dialogAfterSignUp();
-      FirebaseUser user = await _auth.signUp(email, password);
+//      if CueId entered by user is unique from the data saved then only go for signup.
+      var checkCueid = await _auth.checkCueID(cueid);
+      if (!checkCueid) {
+        FirebaseUser user = await _auth.signUp(email, password);
 
-      await user.sendEmailVerification();
-      _auth.saveEmployeeData(
-          userid: user.uid, email: email, cueid: cueid, username: username);
-      _signUpView.clearFields();
-      _signUpView.showVerifyEmailDialog();
+        await user.sendEmailVerification();
+        _auth.saveEmployeeData(
+            userid: user.uid, email: email, cueid: cueid, username: username);
+        _signUpView.clearFields();
+        _signUpView.showVerifyEmailDialog();
+      } else {
+        _signUpView.popDialog();
+        _signUpView.showError("This CueID has been already used.");
+      }
     } catch (error) {
       _signUpView.popDialog();
       _signUpView.showError(error);

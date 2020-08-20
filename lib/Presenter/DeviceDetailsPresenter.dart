@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
+import 'package:flutterdeviceinventory/Model/DeviceDataModel.dart';
 import 'package:flutterdeviceinventory/View/DeviceDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,8 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class Presenter {
   set setView(DeviceDetailsView value) {}
-  void doCheckIn(String key, String platform) {}
-  void doCheckOut(String key, String platform) {}
+  void doCheckIn(Device device, String platform) {}
+  void doCheckOut(Device device, String platform) {}
   void getuser(String key, String status) {}
   void presenterDispose() {}
 }
@@ -25,22 +26,22 @@ class DeviceDetailsPresenter implements Presenter {
   }
 
   @override
-  void doCheckIn(String key, String platform) {
+  void doCheckIn(Device device, String platform) {
     try {
-      _dbManager.saveCheckIn(key);
-      _dbManager.updateDeviceStatus(key, 'Issued', platform);
-      _view.changeToCheckout(key: key);
+      _dbManager.saveCheckIn(device.key);
+      _dbManager.updateDeviceStatus(device, 'Issued', platform);
+      _view.changeToCheckout();
     } catch (error) {
       print("error while doing checkin ------ $error");
     }
   }
 
   @override
-  void doCheckOut(String key, String platform) async {
+  void doCheckOut(Device device, String platform) async {
     try {
-      _dbManager.saveCheckOut(key);
-      _dbManager.updateDeviceStatus(key, "Available", platform);
-      _view.changeToCheckin(key: key);
+      _dbManager.saveCheckOut(device.key);
+      _dbManager.updateDeviceStatus(device, "Available", platform);
+      _view.changeToCheckin();
     } catch (error) {
       print("error while doing checkout ------ $error");
     }
@@ -54,15 +55,16 @@ class DeviceDetailsPresenter implements Presenter {
 
     if (fetchedUser == "Employee") {
       if (status == 'Available') {
-        _view.changeToCheckin(key: key);
+        _view.changeToCheckin();
+        _view.showComplaintButton();
       } else {
-        _dbManager.getIssuedUser(key).then((value) {
+        _dbManager.getIssuedUser().then((value) {
           Query query = value;
           deviceButtonEvent = query.onChildAdded.listen((event) {
             DeviceHistory device = DeviceHistory.fromSnapshot(event.snapshot);
             if (device.deviceKey == key) {
               if (device.user == currentUser.email) {
-                _view.changeToCheckout(key: key);
+                _view.changeToCheckout();
               } else {
                 _view.changeToIssued();
               }
@@ -70,6 +72,8 @@ class DeviceDetailsPresenter implements Presenter {
           });
         });
       }
+    } else {
+      _view.showComplaintButton();
     }
   }
 

@@ -37,6 +37,7 @@ class IssuedPresenter implements Presenter {
           availableDevices.add(device);
           _view.refreshAvailableList(availableDevices);
         } else {
+          print(device);
           issuedDevices.add(device);
           _view.refreshIssuedList(issuedDevices);
         }
@@ -44,7 +45,6 @@ class IssuedPresenter implements Presenter {
 
       devicesChangeEvent = query.onChildChanged.listen((event) {
         Device device = (Device.fromSnapshot(event.snapshot));
-        print(device.deviceName);
         _view.updateDeviceList(device);
       });
     });

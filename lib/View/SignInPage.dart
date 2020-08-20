@@ -2,16 +2,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
+import 'package:flutterdeviceinventory/View/AlertDialogClass.dart';
 import 'package:flutterdeviceinventory/View/ForgotPassword.dart';
 import 'SignUpPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInView {
   void redirectToPlatformSelectionPage(FirebaseUser user) {}
+
   void clearFields() {}
-  void requestToVerify() {}
+
+  void showDialogContent(String title, String content) {}
+
+  void wifiConnectionDialog(String title, String content) {}
+
   void showError(String errorMessage) {}
+
   void dialogAfterLogin() {}
+
   void popDialog() {}
 }
 
@@ -28,6 +36,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> implements SignInView {
   final _formKey = GlobalKey<FormState>();
   String user;
+  AlertDialogClass alertDialogClass;
 
   @override
   void initState() {
@@ -51,6 +60,7 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
 
   @override
   Widget build(BuildContext context) {
+    alertDialogClass = AlertDialogClass(context);
     return Form(
       key: _formKey,
       child: Scaffold(
@@ -60,41 +70,43 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
         ),
         body: Padding(
           padding: EdgeInsets.all(50.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Email',
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                  ),
+                  controller: _emailController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
+                  },
                 ),
-                controller: _emailController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(
-                  hintText: 'Password',
+                TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                  ),
+                  obscureText: true,
+                  controller: _passwordController,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'Please enter some text.';
+                    }
+                  },
                 ),
-                obscureText: true,
-                controller: _passwordController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text.';
-                  }
-                },
-              ),
-              Text(
-                error,
-                style: TextStyle(color: Colors.red),
-              ),
-              loginButton(),
-              signUpButton(),
-              forgotPassword(),
-            ],
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red),
+                ),
+                loginButton(),
+                signUpButton(),
+                forgotPassword(),
+              ],
+            ),
           ),
         ),
       ),
@@ -137,20 +149,18 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   }
 
   Widget forgotPassword() {
-    return Expanded(
-      child: GestureDetector(
-        child: Text(
-          'Forgot Password',
-          style: TextStyle(
-            color: Colors.blue,
-            fontStyle: FontStyle.normal,
-          ),
+    return GestureDetector(
+      child: Text(
+        'Forgot Password',
+        style: TextStyle(
+          color: Colors.blue,
+          fontStyle: FontStyle.normal,
         ),
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ForgotPassword()));
-        },
       ),
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => ForgotPassword()));
+      },
     );
   }
 
@@ -161,26 +171,23 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
   }
 
   @override
-  void requestToVerify() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Verify your account"),
-          content: new Text(
-              "Link has been already sent to your email account please verify it to move forward."),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  void showDialogContent(String title, String content) {
+    alertDialogClass.displayAlertDialog(
+        title, content, true, () {}, false, () {});
+  }
+
+  void wifiConnectionDialog(String title, String content) {
+    alertDialogClass.displayAlertDialog(title, content, true, () {
+      callbackAfterDismiss();
+    }, false, () {});
+  }
+
+  void callbackAfterDismiss() {
+    dialogAfterLogin();
+    this.widget.presenter.checkUserInDatabase(
+        email: _emailController.text,
+        password: _passwordController.text,
+        appUser: user);
   }
 
   @override
@@ -205,15 +212,8 @@ class _SignInPageState extends State<SignInPage> implements SignInView {
 
   @override
   void dialogAfterLogin() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          content: new Text("Please wait..."),
-        );
-      },
-    );
+    alertDialogClass.displayAlertDialog(
+        "Processing", "Please wait...", false, () {}, false, () {});
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterdeviceinventory/DatabaseManager/DbManager.dart';
+import 'AlertDialogClass.dart';
 
 class ForgotPassword extends StatefulWidget {
   @override
@@ -9,8 +10,10 @@ class ForgotPassword extends StatefulWidget {
 
 class _ForgotPasswordState extends State<ForgotPassword> {
   DbManager _auth;
-
+  bool gotError = false;
+  PlatformException err;
   TextEditingController _emailController = TextEditingController();
+  AlertDialogClass alertDialogClass;
 
   @override
   void initState() {
@@ -20,6 +23,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   @override
   Widget build(BuildContext context) {
+    alertDialogClass = AlertDialogClass(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Reset Password'),
@@ -54,38 +58,36 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   void resetPassword() async {
     _auth.resetPassword(_emailController.text).catchError((onError) {
       PlatformException error = onError;
-      setState(() {
-        _emailController.text = "";
-        print("-- ${error.message}");
-      });
+      gotError = true;
+      err = error;
     }).then((value) {
-      setState(() {
-        _emailController.text = "";
-        showAlertDialog("Reset link sent",
-            "Link has been already sent to your email account please follow the instructions to reset password.");
-      });
+      // if got error then show dialog with error else successful dialog box.
+      if (gotError == true) {
+        showErrorMessage(err.message);
+      } else {
+        sendVerifyLink();
+      }
+    });
+  }
+
+  void sendVerifyLink() {
+    setState(() {
+      _emailController.text = "";
+      showAlertDialog("Reset link sent",
+          "Link has been already sent to your email account please follow the instructions to reset password.");
+    });
+  }
+
+  void showErrorMessage(String message) {
+    setState(() {
+      showAlertDialog("Error", message);
+      gotError = false;
     });
   }
 
   void showAlertDialog(String title, String content) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text(title),
-          content: new Text(content),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    alertDialogClass.displayAlertDialog(
+        title, content, true, () {}, false, () {});
   }
 
   @override

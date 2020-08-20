@@ -8,6 +8,7 @@ import 'package:flutterdeviceinventory/Presenter/DeviceListPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/EditDevicePresenter.dart';
 import 'package:flutterdeviceinventory/View/AddDevice.dart';
 import 'package:flutterdeviceinventory/View/EditDevice.dart';
+import 'AlertDialogClass.dart';
 import 'DeviceDetails.dart';
 import 'dart:async';
 
@@ -26,9 +27,14 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
   StreamSubscription<Event> devicesEvent;
   StreamSubscription<Event> devicesChangeEvent;
   DbManager _dbManager = DbManager();
+  AlertDialogClass alertDialog;
+  String keyToDelete;
+  int deviceIndexToDelete;
+  Widget viewBody;
 
   @override
   void initState() {
+    viewBody = Container(child: Center(child: CircularProgressIndicator()));
     this.widget.presenter.setView = this;
     _dbManager.fetchDevices(widget.platform).then((value) {
       Query query = value;
@@ -37,12 +43,12 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
       devicesChangeEvent =
           query.onChildChanged.listen(this.widget.presenter.childUpdatedEvent);
     });
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    alertDialog = AlertDialogClass(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Device List'),
@@ -62,32 +68,36 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
           ),
         ],
       ),
-      body: ListView.separated(
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(devices[index].deviceName),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                showEditIcon(devices[index]),
-                showDeleteIcon(devices[index].key, index),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => DeviceDetails(
-                            presenter: DeviceDetailsPresenter(),
-                            device: devices[index],
-                            platform: this.widget.platform,
-                          )));
-            },
-          );
-        },
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: devices.length,
-      ),
+      body: viewBody,
+    );
+  }
+
+  Widget createList() {
+    return ListView.separated(
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(devices[index].deviceName),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              showEditIcon(devices[index]),
+              showDeleteIcon(devices[index].key, index),
+            ],
+          ),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => DeviceDetails(
+                          presenter: DeviceDetailsPresenter(),
+                          device: devices[index],
+                          platform: this.widget.platform,
+                        )));
+          },
+        );
+      },
+      separatorBuilder: (context, index) => Divider(),
+      itemCount: devices.length,
     );
   }
 
@@ -107,6 +117,7 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
   @override
   void refreshState(List<Device> deviceList) {
     setState(() {
+      viewBody = createList();
       devices = deviceList;
     });
   }
@@ -141,33 +152,23 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
         color: Colors.red,
       ),
       onTap: () {
-        this
-            .widget
-            .presenter
-            .deleteDevice(key, index, this.widget.platform, this);
+        keyToDelete = key;
+        deviceIndexToDelete = index;
+        alertDialog.displayAlertDialog("Do you want to continue?",
+            "Are you sure you want to delete", true, () {}, true, afterOk);
       },
     );
   }
 
   Widget deleteSuccessfulDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Successful"),
-          content: new Text("Data has been successfully deleted."),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    alertDialog.displayAlertDialog("Successful",
+        "Data has been successfully deleted.", true, () {}, false, () {});
+  }
+
+  void afterOk() {
+    // task after ok button is clicked.
+    this.widget.presenter.deleteDevice(
+        keyToDelete, deviceIndexToDelete, this.widget.platform, this);
   }
 
   @override
@@ -187,6 +188,8 @@ class _DeviceListState extends State<DeviceList> implements DeviceListView {
 
 class DeviceListView {
   void refreshState(List<Device> deviceList) {}
+
   void updateDeviceList(Device updatedDevice) {}
+
   void removeDevice(int index) {}
 }

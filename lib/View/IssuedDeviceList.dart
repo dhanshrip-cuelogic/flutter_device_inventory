@@ -8,6 +8,7 @@ class IssuedDeviceView {
   void refreshAvailableList(List<Device> deviceList) {}
 
   void refreshIssuedList(List<Device> deviceList) {}
+
   void updateDeviceList(Device device) {}
 }
 
@@ -25,8 +26,8 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
     implements IssuedDeviceView {
   List<Device> availableDevices = [];
   List<Device> issuedDevices = [];
-
-//  List<Device> deviceLists = [];
+  bool displayIssuedList = false;
+  bool displayAvailableList = false;
 
   @override
   void initState() {
@@ -37,52 +38,67 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Issued Devices'),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: <Widget>[
-          ListTile(
-            title: Text('Available Devices'),
-            enabled: false,
-            leading: Icon(Icons.forward),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Devices'),
+          centerTitle: true,
+          bottom: TabBar(
+            tabs: [
+              Tab(
+                text: 'Available Devices',
+                icon: Icon(Icons.phone_iphone),
+              ),
+              Tab(
+                text: 'Issued Devices',
+                icon: Icon(Icons.phone_iphone),
+              )
+            ],
           ),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(availableDevices[index].deviceName),
-                    onTap: () {
-                      redirectToDeviceDetails(availableDevices[index]);
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) => Divider(),
-                itemCount: availableDevices.length),
-          ),
-          ListTile(
-            title: Text('Issued Devices'),
-            enabled: false,
-            leading: Icon(Icons.forward),
-          ),
-          Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(issuedDevices[index].deviceName),
-                    onTap: () {
-                      redirectToDeviceDetails(issuedDevices[index]);
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) => Divider(),
-                itemCount: issuedDevices.length),
-          ),
-        ],
+        ),
+        body: TabBarView(
+          children: [
+            displayAvailableList == true
+                ? createAvailableList()
+                : Container(child: Center(child: CircularProgressIndicator())),
+            displayIssuedList == true
+                ? createIssuedList()
+                : Container(child: Center(child: CircularProgressIndicator())),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget createAvailableList() {
+    return ListView.separated(
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(availableDevices[index].deviceName),
+            onTap: () {
+              redirectToDeviceDetails(availableDevices[index]);
+            },
+          );
+        },
+        separatorBuilder: (context, index) => Divider(),
+        itemCount: availableDevices.length);
+  }
+
+  Widget createIssuedList() {
+    return ListView.separated(
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(issuedDevices[index].deviceName),
+            subtitle: Text(issuedDevices[index].checkin),
+            trailing: Text(issuedDevices[index].issuedUser),
+            onTap: () {
+              redirectToDeviceDetails(issuedDevices[index]);
+            },
+          );
+        },
+        separatorBuilder: (context, index) => Divider(),
+        itemCount: issuedDevices.length);
   }
 
   void redirectToDeviceDetails(Device device) {
@@ -99,6 +115,7 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
   @override
   void refreshAvailableList(List<Device> deviceList) {
     setState(() {
+      displayAvailableList = true;
       availableDevices = deviceList;
     });
   }
@@ -106,6 +123,7 @@ class _IssuedDeviceListState extends State<IssuedDeviceList>
   @override
   void refreshIssuedList(List<Device> deviceList) {
     setState(() {
+      displayIssuedList = true;
       issuedDevices = deviceList;
     });
   }

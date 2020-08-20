@@ -6,10 +6,11 @@ import 'package:flutterdeviceinventory/View/DeviceHistoryPage.dart';
 import 'package:flutterdeviceinventory/View/RegisterComplaint.dart';
 
 class DeviceDetailsView {
-  void changeToCheckout({String key}) {}
-  void changeToCheckin({String key}) {}
-  void changeToIssued({String key}) {}
+  void changeToCheckout() {}
+  void changeToCheckin() {}
+  void changeToIssued() {}
   void circularIndicator() {}
+  void showComplaintButton() {}
 }
 
 class DeviceDetails extends StatefulWidget {
@@ -27,6 +28,7 @@ class _DeviceDetailsState extends State<DeviceDetails>
     implements DeviceDetailsView {
   String user = 'Admin';
   Widget button = Container();
+  Widget registerComplaintButton = Container();
 
   @override
   void initState() {
@@ -58,9 +60,12 @@ class _DeviceDetailsState extends State<DeviceDetails>
               deviceID(widget.device.key),
               deviceName(widget.device.deviceName),
               osVersion(widget.device.osVersion),
+              display(widget.device.display),
+              ram(widget.device.ram),
+              processor(widget.device.processor),
               button,
               historyButton(widget.device.key),
-              complaintButton(widget.device.deviceName),
+              registerComplaintButton,
             ],
           ),
         ));
@@ -114,12 +119,60 @@ class _DeviceDetailsState extends State<DeviceDetails>
     );
   }
 
-  Widget checkInButton(String key) {
+  Widget display(String display) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text('Display'),
+        ),
+        Expanded(
+          child: TextFormField(
+            enabled: false,
+            initialValue: display,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget ram(String ram) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text('RAM'),
+        ),
+        Expanded(
+          child: TextFormField(
+            enabled: false,
+            initialValue: ram,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget processor(String processor) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Text('Processor'),
+        ),
+        Expanded(
+          child: TextFormField(
+            enabled: false,
+            initialValue: processor,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget checkInButton(Device device) {
     return RaisedButton(
       color: Colors.green,
       textColor: Colors.white,
       onPressed: () {
-        this.widget.presenter.doCheckIn(key, this.widget.platform);
+        this.widget.presenter.doCheckIn(device, this.widget.platform);
       },
       child: Text('Check-In'),
     );
@@ -134,12 +187,12 @@ class _DeviceDetailsState extends State<DeviceDetails>
     );
   }
 
-  Widget checkOutButton(String key) {
+  Widget checkOutButton(Device device) {
     return RaisedButton(
       color: Colors.red,
       textColor: Colors.white,
       onPressed: () {
-        widget.presenter.doCheckOut(key, this.widget.platform);
+        widget.presenter.doCheckOut(device, this.widget.platform);
       },
       child: Text('Check-Out'),
     );
@@ -175,23 +228,30 @@ class _DeviceDetailsState extends State<DeviceDetails>
   }
 
   @override
-  void changeToCheckout({String key}) {
+  void changeToCheckout() {
     setState(() {
-      button = checkOutButton(key);
+      button = checkOutButton(this.widget.device);
     });
   }
 
   @override
-  void changeToCheckin({String key}) {
+  void changeToCheckin() {
     setState(() {
-      button = checkInButton(key);
+      button = checkInButton(this.widget.device);
     });
   }
 
   @override
-  void changeToIssued({String key}) {
+  void changeToIssued() {
     setState(() {
       button = issuedButton();
+    });
+  }
+
+  @override
+  void showComplaintButton() {
+    setState(() {
+      registerComplaintButton = complaintButton(widget.device.deviceName);
     });
   }
 

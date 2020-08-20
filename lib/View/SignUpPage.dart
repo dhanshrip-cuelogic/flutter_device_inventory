@@ -1,14 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterdeviceinventory/Presenter/SignInPresenter.dart';
 import 'package:flutterdeviceinventory/Presenter/SignUpPresenter.dart';
-import 'SignInPage.dart';
+import 'package:flutterdeviceinventory/View/AlertDialogClass.dart';
 
 class SignUpView {
   void showVerifyEmailDialog() {}
+
   void clearFields() {}
+
   void dialogAfterSignUp() {}
+
   void popDialog() {}
+
   void showError(String errorMessage) {}
 }
 
@@ -29,6 +32,7 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
   final _cueidController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  AlertDialogClass alertDialogClass;
 
   String error = '';
 
@@ -40,6 +44,7 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
 
   @override
   Widget build(BuildContext context) {
+    alertDialogClass = AlertDialogClass(context);
     return Form(
       key: _formKey,
       child: Scaffold(
@@ -116,7 +121,7 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
                         .widget
                         .presenter
                         .validatePassword(password: value)) {
-                      return 'Please enter Password stating with Capital and must include atleast one small letter, one special character and one digit';
+                      return 'Start with Capital, must have 1 small letter, character, digit';
                     }
 
                     return null;
@@ -162,13 +167,7 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
   Widget loginButton() {
     return RaisedButton(
       onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SignInPage(
-                      presenter: SignInPresenter(),
-                      signedIn: signedIn,
-                    )));
+        Navigator.pop(context);
       },
       child: Text('Login'),
     );
@@ -180,25 +179,10 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
 
   @override
   void showVerifyEmailDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Verify your account"),
-          content: new Text("Please verify account in the link sent to email"),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Dismiss"),
-              onPressed: () {
-                Navigator.pop(context);
-                popDialog();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    alertDialogClass.displayAlertDialog("Verify your account",
+        "Please verify account in the link sent to email", true, () {
+      popDialog();
+    }, false, () {});
   }
 
   @override
@@ -218,15 +202,8 @@ class _SignUpPageState extends State<SignUpPage> implements SignUpView {
 
   @override
   void dialogAfterSignUp() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          content: new Text("Please wait..."),
-        );
-      },
-    );
+    alertDialogClass.displayAlertDialog(
+        "Processing", "Please wait...", false, () {}, false, () {});
   }
 
   @override
